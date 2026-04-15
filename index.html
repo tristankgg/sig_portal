@@ -100,7 +100,7 @@
                 <button type="submit" class="login-btn">Sign In</button>
                 <div class="login-footer">
                     <span class="login-footer-text">Developed by TGC</span>
-                    <span class="login-footer-text">v0.19</span>
+                    <span class="login-footer-text">v0.20</span>
                 </div>
             </form>
         </div>
@@ -188,6 +188,7 @@
 
     <script>
         const HARDCODED_USERS = [{"id":"1","email":"tristankgg@gmail.com","password":"password123!","profile":{"contactName":"Tristan Gallagher","contactPhone":"","businessName":"Kitchen Installation Co.","businessEmail":"","abn":"","notes":""}}];
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwm3DRKzuGdFZbqncKUwTIiFRIoX3mqMWdxu9YXK3EPznFaWWwxV5hZYI9Lyh_232nU/exec';
         let currentUser = null, referrals = [];
 
         window.addEventListener('load', () => {
@@ -224,6 +225,15 @@
             showNotification('Referrals loaded!', 'success');
         }
 
+        function sendReferralToSheet(ref) {
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ref)
+            }).catch(e => console.error('Fetch error (expected with no-cors):', e));
+        }
+
         function openAddReferral() { document.getElementById('addReferralModal').classList.add('active'); }
         function closeAddReferral() { document.getElementById('addReferralModal').classList.remove('active'); document.getElementById('referralForm').reset(); }
 
@@ -238,14 +248,15 @@
                 email: document.getElementById('email').value,
                 notes: document.getElementById('notes').value,
                 status: 'pending',
-                dateAdded: new Date().toLocaleDateString()
+                dateAdded: new Date().toLocaleString()
             };
             referrals.push(ref);
             const key = `referrals_${currentUser.id}`;
             localStorage.setItem(key, JSON.stringify(referrals));
+            sendReferralToSheet(ref);
             closeAddReferral();
             loadReferrals();
-            showNotification('Referral added! (stored locally)', 'success');
+            showNotification('Referral added and syncing to Google Sheet!', 'success');
         }
 
         function deleteReferral(id) {
