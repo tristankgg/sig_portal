@@ -100,7 +100,7 @@
                 <button type="submit" class="login-btn">Sign In</button>
                 <div class="login-footer">
                     <span class="login-footer-text">Developed by TGC</span>
-                    <span class="login-footer-text">v0.18</span>
+                    <span class="login-footer-text">v0.19</span>
                 </div>
             </form>
         </div>
@@ -142,7 +142,7 @@
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Customer Name</th><th>Phone</th><th>Business</th><th>Status</th><th>Actions</th></tr></thead>
-                            <tbody id="referralsTable"><tr><td colspan="5" style="text-align: center; color: #666;">Loading...</td></tr></tbody>
+                            <tbody id="referralsTable"><tr><td colspan="5" style="text-align: center; color: #666;">No referrals yet</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -188,7 +188,6 @@
 
     <script>
         const HARDCODED_USERS = [{"id":"1","email":"tristankgg@gmail.com","password":"password123!","profile":{"contactName":"Tristan Gallagher","contactPhone":"","businessName":"Kitchen Installation Co.","businessEmail":"","abn":"","notes":""}}];
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwm3DRKzuGdFZbqncKUwTIiFRIoX3mqMWdxu9YXK3EPznFaWWwxV5hZYI9Lyh_232nU/exec';
         let currentUser = null, referrals = [];
 
         window.addEventListener('load', () => {
@@ -217,35 +216,18 @@
 
         function updateUserDisplay() { const name = currentUser.profile.contactName; const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2); document.getElementById('userDisplayName').textContent = name; document.getElementById('userDisplayCompany').textContent = currentUser.profile.businessName; document.getElementById('userAvatarMain').textContent = initials; }
 
-        async function loadReferrals() {
-            try {
-                const response = await fetch(APPS_SCRIPT_URL + '?action=getReferrals');
-                const data = await response.json();
-                referrals = Array.isArray(data) ? data.filter(ref => ref && ref.userId === currentUser.id) : [];
-                updateTable();
-                showNotification('Referrals loaded!', 'success');
-            } catch (e) { console.error('Load error:', e); referrals = []; updateTable(); }
-        }
-
-        async function addReferralToSheet(ref) {
-            try {
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(ref)
-                });
-                console.log('POST response status:', response.status);
-                const result = await response.json();
-                console.log('POST result:', result);
-                if (!result.success) throw new Error(result.error || 'Unknown error');
-                return true;
-            } catch (e) { console.error('POST error:', e); throw e; }
+        function loadReferrals() {
+            const key = `referrals_${currentUser.id}`;
+            const stored = localStorage.getItem(key);
+            referrals = stored ? JSON.parse(stored) : [];
+            updateTable();
+            showNotification('Referrals loaded!', 'success');
         }
 
         function openAddReferral() { document.getElementById('addReferralModal').classList.add('active'); }
         function closeAddReferral() { document.getElementById('addReferralModal').classList.remove('active'); document.getElementById('referralForm').reset(); }
 
-        async function handleAddReferral(e) {
+        function handleAddReferral(e) {
             e.preventDefault();
             const ref = {
                 id: Date.now(),
@@ -258,20 +240,19 @@
                 status: 'pending',
                 dateAdded: new Date().toLocaleDateString()
             };
-            console.log('Sending referral:', ref);
-            try {
-                await addReferralToSheet(ref);
-                closeAddReferral();
-                setTimeout(() => loadReferrals(), 2000);
-                showNotification('Referral added successfully!', 'success');
-            } catch (err) {
-                showNotification('Error: ' + err.message, 'error');
-            }
+            referrals.push(ref);
+            const key = `referrals_${currentUser.id}`;
+            localStorage.setItem(key, JSON.stringify(referrals));
+            closeAddReferral();
+            loadReferrals();
+            showNotification('Referral added! (stored locally)', 'success');
         }
 
         function deleteReferral(id) {
             if (confirm('Delete this referral?')) {
                 referrals = referrals.filter(r => r.id !== id);
+                const key = `referrals_${currentUser.id}`;
+                localStorage.setItem(key, JSON.stringify(referrals));
                 updateTable();
                 showNotification('Referral deleted', 'success');
             }
@@ -280,7 +261,7 @@
         function updateTable() {
             const tbody = document.getElementById('referralsTable');
             if (!referrals.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #666;">No referrals yet</td></tr>'; return; }
-            tbody.innerHTML = referrals.map(ref => `<tr><td>${ref.customerName}</td><td>${ref.phoneNumber}</td><td>${ref.business}</td><td><span class="status-badge status-${ref.status}">${ref.status}</span></td><td><button class="action-btn" onclick="deleteReferral(${ref.id})">🗑</button></td></tr>`).join('');
+            tbody.innerHTML = referrals.map(ref => `<tr><td>${ref.customerName}</td><td>${ref.phoneNumber}</td><td>${ref.business}</td><td><span class="status-badge status-${ref.status}">${ref.status}</span></td><td><button class="action-btn" onclick="deleteReferral(${ref.id})" style="cursor: pointer;">🗑</button></td></tr>`).join('');
         }
 
         function navigateTo(page, e) {
