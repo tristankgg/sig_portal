@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { Octokit } = require('octokit');
+const crypto = require('crypto');
 
 const app = express();
 
@@ -15,39 +16,220 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER = process.env.GITHUB_OWNER || 'tristankgg';
 const GITHUB_REPO = process.env.GITHUB_REPO || 'sig_portal';
-const DATA_FILE = 'data/referrals.json';
+const USERS_FILE = 'data/users.json';
+const REFERRALS_FILE = 'data/referrals.json';
 
 // Initialize Octokit with authentication
 const octokit = new Octokit({
   auth: GITHUB_TOKEN
 });
 
+// Encryption helper functions
+const encryptionKey = process.env.ENCRYPTION_KEY || 'default-encryption-key-change-in-production';
+
+function encrypt(text) {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(encryptionKey.padEnd(32)), iv);
+  let encrypted = cipher.update(text, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return iv.toString('hex') + ':' + encrypted;
+}
+
+function decrypt(text) {
+  const parts = text.split(':');
+  const iv = Buffer.from(parts[0], 'hex');
+  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(encryptionKey.padEnd(32)), iv);
+  let decrypted = decipher.update(parts[1], 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'Backend is running' });
 });
 
-// Get referrals from GitHub
-app.get('/api/referrals', async (req, res) => {
+// ==================== USER AUTHENTICATION ====================
+
+// Login endpoint
+app.post('/api/auth/login', async (req, res) => {
   try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email and password are required'
+      });
+    }
+
+    // Fetch users from GitHub
     const response = await octokit.rest.repos.getContent({
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
-      path: DATA_FILE
+      path: USERS_FILE
     });
 
     const content = Buffer.from(response.data.content, 'base64').toString('utf-8');
     const data = JSON.parse(content);
 
+    // Find user by email
+    const user = data.users.find(u => u.email === email);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid email or password'
+      });
+    }
+
+    // Check password (simple comparison for now)
+    if (user.password !== password) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid email or password'
+      });
+    }
+
+    // Return user session token (simplified - just base64 of user ID)
+    const sessionToken = Buffer.from(user.id).toString('base64');
+
     res.json({
       success: true,
-      referrals: data.referrals || [],
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        profile: user.profile
+      },
+      sessionToken: sessionToken
+    });
+  } catch (error) {
+    console.error('Error during login:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Login failed'
+    });
+  }
+});
+
+// Get user profile
+app.get('/api/auth/profile/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const response = await octokit.rest.repos.getContent({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      path: USERS_FILE
+    });
+
+    const content = Buffer.from(response.data.content, 'base64').toString('utf-8');
+    const data = JSON.parse(content);
+
+    const user = data.users.find(u => u.id === userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      profile: user.profile
+    });
+  } catch (error) {
+    console.error('Error fetching profile:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch profile'
+    });
+  }
+});
+
+// Update user profile
+app.post('/api/auth/profile/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const profileData = req.body;
+
+    // Get current users file
+    const getResponse = await octokit.rest.repos.getContent({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      path: USERS_FILE
+    });
+
+    const content = Buffer.from(getResponse.data.content, 'base64').toString('utf-8');
+    const data = JSON.parse(content);
+
+    // Find and update user
+    const userIndex = data.users.findIndex(u => u.id === userId);
+
+    if (userIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    data.users[userIndex].profile = profileData;
+
+    // Save updated users file
+    const encodedContent = Buffer.from(JSON.stringify(data, null, 2)).toString('base64');
+
+    await octokit.rest.repos.createOrUpdateFileContents({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      path: USERS_FILE,
+      message: `Update profile for user ${userId}`,
+      content: encodedContent,
+      sha: getResponse.data.sha
+    });
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      profile: data.users[userIndex].profile
+    });
+  } catch (error) {
+    console.error('Error updating profile:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update profile'
+    });
+  }
+});
+
+// ==================== REFERRALS MANAGEMENT ====================
+
+// Get referrals for a user
+app.get('/api/referrals/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const response = await octokit.rest.repos.getContent({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      path: REFERRALS_FILE
+    });
+
+    const content = Buffer.from(response.data.content, 'base64').toString('utf-8');
+    const data = JSON.parse(content);
+
+    // Filter referrals by user ID
+    const userReferrals = (data.referrals || []).filter(ref => ref.userId === userId);
+
+    res.json({
+      success: true,
+      referrals: userReferrals,
       sha: response.data.sha
     });
   } catch (error) {
     console.error('Error fetching referrals:', error.message);
-    
-    // If file doesn't exist, return empty array
+
     if (error.status === 404) {
       return res.json({
         success: true,
@@ -58,14 +240,15 @@ app.get('/api/referrals', async (req, res) => {
 
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch referrals from GitHub'
+      error: 'Failed to fetch referrals'
     });
   }
 });
 
-// Save referrals to GitHub
-app.post('/api/referrals', async (req, res) => {
+// Save referrals for a user
+app.post('/api/referrals/:userId', async (req, res) => {
   try {
+    const userId = req.params.userId;
     const { referrals } = req.body;
 
     if (!Array.isArray(referrals)) {
@@ -75,29 +258,45 @@ app.post('/api/referrals', async (req, res) => {
       });
     }
 
-    // Get current file to obtain SHA
+    // Add userId to all referrals
+    const referralsWithUserId = referrals.map(ref => ({
+      ...ref,
+      userId: userId
+    }));
+
+    // Get current referrals file
     let fileSha = null;
+    let allReferrals = [];
+
     try {
       const getResponse = await octokit.rest.repos.getContent({
         owner: GITHUB_OWNER,
         repo: GITHUB_REPO,
-        path: DATA_FILE
+        path: REFERRALS_FILE
       });
       fileSha = getResponse.data.sha;
+      const content = Buffer.from(getResponse.data.content, 'base64').toString('utf-8');
+      const data = JSON.parse(content);
+      
+      // Keep referrals from other users
+      allReferrals = (data.referrals || []).filter(ref => ref.userId !== userId);
     } catch (err) {
-      // File doesn't exist yet, that's okay
-      console.log('File does not exist yet, will create new one');
+      // File doesn't exist yet
+      console.log('Referrals file does not exist yet');
     }
 
-    const content = JSON.stringify({ referrals }, null, 2);
-    const encodedContent = Buffer.from(content).toString('base64');
+    // Combine with new referrals
+    allReferrals = [...allReferrals, ...referralsWithUserId];
 
-    const commitMessage = `Update referrals - ${new Date().toLocaleString()}`;
+    const fileContent = JSON.stringify({ referrals: allReferrals }, null, 2);
+    const encodedContent = Buffer.from(fileContent).toString('base64');
+
+    const commitMessage = `Update referrals for user ${userId} - ${new Date().toLocaleString()}`;
 
     const response = await octokit.rest.repos.createOrUpdateFileContents({
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
-      path: DATA_FILE,
+      path: REFERRALS_FILE,
       message: commitMessage,
       content: encodedContent,
       ...(fileSha && { sha: fileSha })
@@ -112,36 +311,39 @@ app.post('/api/referrals', async (req, res) => {
     console.error('Error saving referrals:', error.message);
     res.status(500).json({
       success: false,
-      error: 'Failed to save referrals to GitHub'
+      error: 'Failed to save referrals'
     });
   }
 });
 
 // Delete a referral
-app.delete('/api/referrals/:id', async (req, res) => {
+app.delete('/api/referrals/:userId/:referralId', async (req, res) => {
   try {
-    const referralId = parseInt(req.params.id);
+    const userId = req.params.userId;
+    const referralId = parseInt(req.params.referralId);
 
     // Get current referrals
     const getResponse = await octokit.rest.repos.getContent({
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
-      path: DATA_FILE
+      path: REFERRALS_FILE
     });
 
     const content = Buffer.from(getResponse.data.content, 'base64').toString('utf-8');
     let data = JSON.parse(content);
 
-    // Filter out the deleted referral
-    data.referrals = data.referrals.filter(ref => ref.id !== referralId);
+    // Filter out the deleted referral for this user only
+    data.referrals = data.referrals.filter(ref => 
+      !(ref.id === referralId && ref.userId === userId)
+    );
 
     const encodedContent = Buffer.from(JSON.stringify(data, null, 2)).toString('base64');
 
     await octokit.rest.repos.createOrUpdateFileContents({
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
-      path: DATA_FILE,
-      message: `Delete referral ${referralId}`,
+      path: REFERRALS_FILE,
+      message: `Delete referral ${referralId} for user ${userId}`,
       content: encodedContent,
       sha: getResponse.data.sha
     });
