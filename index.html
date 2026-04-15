@@ -5,580 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signature Appliances - Rewards Portal</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f3f4f6;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .login-container {
-            display: flex;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .login-box {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 420px;
-            padding: 40px;
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .login-logo {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: white;
-            margin: 0 auto 16px;
-            font-weight: bold;
-        }
-
-        .login-header h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #1a1a1a;
-        }
-
-        .login-header p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .login-form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group-login {
-            margin-bottom: 20px;
-        }
-
-        .form-group-login label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .form-group-login input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.2s;
-            background-color: #f9fafb;
-        }
-
-        .form-group-login input:focus {
-            outline: none;
-            border-color: #4a90e2;
-            background-color: white;
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 10px;
-        }
-
-        .login-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3);
-        }
-
-        .login-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .login-error {
-            color: #ef4444;
-            font-size: 14px;
-            margin-bottom: 16px;
-            padding: 12px;
-            background-color: #fee2e2;
-            border-radius: 6px;
-            display: none;
-            border: 1px solid #fecaca;
-        }
-
-        .login-error.show {
-            display: block;
-        }
-
-        .token-section {
-            margin-bottom: 20px;
-            padding: 16px;
-            background-color: #f0f9ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 8px;
-        }
-
-        .token-section label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .token-section input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #bfdbfe;
-            border-radius: 6px;
-            font-size: 12px;
-            font-family: monospace;
-            margin-bottom: 8px;
-        }
-
-        .token-section .help-text {
-            font-size: 12px;
-            color: #0369a1;
-        }
-
-        .token-section a {
-            color: #0369a1;
-            text-decoration: none;
-        }
-
-        .app-container {
-            display: none;
-        }
-
-        .app-container.active {
-            display: flex;
-        }
-
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 200px;
-            background-color: #1a1f3a;
-            padding: 24px 16px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo {
-            font-size: 18px;
-            font-weight: 500;
-            color: white;
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logo-circle {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-            border-radius: 6px;
-        }
-
-        .sidebar-section {
-            margin-bottom: 32px;
-        }
-
-        .sidebar-label {
-            font-size: 12px;
-            color: #8892a8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-        }
-
-        .sidebar-menu li {
-            margin-bottom: 8px;
-        }
-
-        .sidebar-menu a {
-            color: #b4bcc8;
-            text-decoration: none;
-            font-size: 14px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            display: block;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .sidebar-menu a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
-        .sidebar-menu a.active {
-            background-color: #4a90e2;
-            color: white;
-        }
-
-        .logout-btn {
-            margin-top: auto;
-            padding: 12px;
-            background-color: rgba(255, 59, 48, 0.1);
-            color: #ff3b30;
-            border: 1px solid rgba(255, 59, 48, 0.3);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .logout-btn:hover {
-            background-color: rgba(255, 59, 48, 0.2);
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 24px 32px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 500;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background-color: #4a90e2;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background-color: #4a90e2;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #357abd;
-        }
-
-        .btn-secondary {
-            background-color: white;
-            color: #333;
-            border: 1px solid #e5e7eb;
-        }
-
-        .btn-secondary:hover {
-            background-color: #f9fafb;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: 12px;
-            padding: 32px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .modal-header {
-            margin-bottom: 24px;
-        }
-
-        .modal-header h2 {
-            font-size: 22px;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .modal-header p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.2s;
-            background-color: white;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #4a90e2;
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-        }
-
-        .modal-footer {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-
-        .table-container {
-            background-color: white;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            overflow: hidden;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        thead {
-            background-color: #f3f4f6;
-        }
-
-        th {
-            padding: 16px;
-            text-align: left;
-            font-weight: 500;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        td {
-            padding: 16px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        tbody tr:hover {
-            background-color: #f9fafb;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-pending {
-            background-color: rgba(240, 153, 31, 0.1);
-            color: #f99d1c;
-        }
-
-        .status-active {
-            background-color: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-        }
-
-        .action-icons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .action-btn {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            color: #999;
-            transition: all 0.2s;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-
-        .action-btn:hover {
-            background-color: #f3f4f6;
-            color: #333;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: 8px;
-            color: white;
-            z-index: 2000;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .notification.success {
-            background-color: #22c55e;
-        }
-
-        .notification.error {
-            background-color: #ef4444;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .profile-form {
-            max-width: 700px;
-            background-color: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-            border: 1px solid #e5e7eb;
-        }
-
-        .profile-footer {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 40px;
-            padding-top: 32px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        .profile-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-        }
-
-        .profile-back-btn {
-            background: none;
-            border: none;
-            color: #4a90e2;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .profile-back-btn:hover {
-            text-decoration: underline;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f3f4f6; color: #333; line-height: 1.6; }
+        .login-container { display: flex; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); align-items: center; justify-content: center; padding: 20px; }
+        .login-box { background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); width: 100%; max-width: 420px; padding: 40px; }
+        .login-header { text-align: center; margin-bottom: 40px; }
+        .login-logo { width: 60px; height: 60px; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; margin: 0 auto 16px; font-weight: bold; }
+        .login-header h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; color: #1a1a1a; }
+        .login-header p { color: #666; font-size: 14px; }
+        .login-form { display: flex; flex-direction: column; }
+        .form-group-login { margin-bottom: 20px; }
+        .form-group-login label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #333; }
+        .form-group-login input { width: 100%; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-family: inherit; background-color: #f9fafb; }
+        .form-group-login input:focus { outline: none; border-color: #4a90e2; background-color: white; box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1); }
+        .login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .login-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3); }
+        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .login-error { color: #ef4444; font-size: 14px; margin-bottom: 16px; padding: 12px; background-color: #fee2e2; border-radius: 6px; display: none; }
+        .login-error.show { display: block; }
+        .app-container { display: none; }
+        .app-container.active { display: flex; }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar { width: 200px; background-color: #1a1f3a; padding: 24px 16px; display: flex; flex-direction: column; }
+        .logo { font-size: 18px; font-weight: 500; color: white; margin-bottom: 40px; display: flex; align-items: center; gap: 8px; }
+        .logo-circle { width: 24px; height: 24px; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); border-radius: 6px; }
+        .sidebar-section { margin-bottom: 32px; }
+        .sidebar-label { font-size: 12px; color: #8892a8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { margin-bottom: 8px; }
+        .sidebar-menu a { color: #b4bcc8; text-decoration: none; font-size: 14px; padding: 8px 12px; border-radius: 6px; display: block; cursor: pointer; }
+        .sidebar-menu a:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .sidebar-menu a.active { background-color: #4a90e2; color: white; }
+        .logout-btn { margin-top: auto; padding: 12px; background-color: rgba(255, 59, 48, 0.1); color: #ff3b30; border: 1px solid rgba(255, 59, 48, 0.3); border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .main-content { flex: 1; padding: 24px 32px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .header h1 { font-size: 28px; font-weight: 500; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 40px; height: 40px; background-color: #4a90e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 500; }
+        .controls { display: flex; gap: 12px; margin-bottom: 24px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+        .btn-primary { background-color: #4a90e2; color: white; }
+        .btn-primary:hover { background-color: #357abd; }
+        .btn-secondary { background-color: white; color: #333; border: 1px solid #e5e7eb; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background-color: white; border-radius: 12px; padding: 32px; max-width: 500px; width: 90%; }
+        .modal-header { margin-bottom: 24px; }
+        .modal-header h2 { font-size: 22px; font-weight: 500; margin-bottom: 8px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #333; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #4a90e2; box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1); }
+        .modal-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+        .table-container { background-color: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        thead { background-color: #f3f4f6; }
+        th { padding: 16px; text-align: left; font-weight: 500; border-bottom: 1px solid #e5e7eb; }
+        td { padding: 16px; border-bottom: 1px solid #e5e7eb; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-pending { background-color: rgba(240, 153, 31, 0.1); color: #f99d1c; }
+        .action-btn { cursor: pointer; color: #999; font-size: 16px; border: none; background: transparent; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; z-index: 2000; animation: slideIn 0.3s; }
+        .notification.success { background-color: #22c55e; }
+        .notification.error { background-color: #ef4444; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .profile-form { max-width: 700px; background-color: white; padding: 40px; border-radius: 12px; border: 1px solid #e5e7eb; }
+        .profile-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 40px; padding-top: 32px; border-top: 1px solid #e5e7eb; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .profile-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .profile-back-btn { background: none; border: none; color: #4a90e2; cursor: pointer; font-weight: 500; }
     </style>
 </head>
 <body>
-    <!-- LOGIN PAGE -->
     <div class="login-container" id="loginContainer">
         <div class="login-box">
             <div class="login-header">
@@ -586,42 +85,25 @@
                 <h1>Welcome Back</h1>
                 <p>Signature Appliances Rewards Portal</p>
             </div>
-
-            <div class="token-section" id="tokenSection">
-                <label for="githubToken">GitHub Personal Access Token</label>
-                <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxx">
-                <div class="help-text">
-                    Need a token? <a href="https://github.com/settings/tokens" target="_blank">Create one here</a> (select "repo" scope)
-                </div>
-            </div>
-
             <form class="login-form" onsubmit="handleLogin(event)">
                 <div class="login-error" id="loginError"></div>
-
                 <div class="form-group-login">
                     <label for="loginEmail">Email Address</label>
-                    <input type="email" id="loginEmail" required placeholder="Enter your email" value="tristankgg@gmail.com">
+                    <input type="email" id="loginEmail" required value="tristankgg@gmail.com">
                 </div>
-
                 <div class="form-group-login">
                     <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" required placeholder="Enter your password" value="password123!">
+                    <input type="password" id="loginPassword" required value="password123!">
                 </div>
-
-                <button type="submit" class="login-btn" id="loginBtn">Sign In</button>
+                <button type="submit" class="login-btn">Sign In</button>
             </form>
         </div>
     </div>
 
-    <!-- MAIN APP -->
     <div class="app-container" id="appContainer">
         <div class="container">
             <div class="sidebar">
-                <div class="logo">
-                    <div class="logo-circle"></div>
-                    <span>Signature</span>
-                </div>
-
+                <div class="logo"><div class="logo-circle"></div><span>Signature</span></div>
                 <div class="sidebar-section">
                     <div class="sidebar-label">Account</div>
                     <ul class="sidebar-menu">
@@ -630,120 +112,49 @@
                         <li><a href="#" class="nav-link" onclick="navigateTo('analytics', event)">Analytics</a></li>
                     </ul>
                 </div>
-
                 <div class="sidebar-section">
                     <div class="sidebar-label">Settings</div>
                     <ul class="sidebar-menu">
                         <li><a href="#" class="nav-link" onclick="openProfilePage(event)">My Profile</a></li>
                     </ul>
                 </div>
-
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
-
             <div class="main-content">
-                <!-- Referrals Page -->
                 <div id="referralsPage" class="page active">
                     <div class="header">
                         <h1>Referrals</h1>
                         <div class="user-info">
-                            <div>
-                                <div style="font-size: 14px; font-weight: 500;" id="userDisplayName">User</div>
-                                <div style="font-size: 12px; color: #666;" id="userDisplayCompany">Company</div>
-                            </div>
+                            <div><div style="font-size: 14px; font-weight: 500;" id="userDisplayName">User</div><div style="font-size: 12px; color: #666;" id="userDisplayCompany">Company</div></div>
                             <div class="user-avatar" id="userAvatarMain">U</div>
                         </div>
                     </div>
-
                     <div class="controls">
                         <button class="btn btn-primary" onclick="openAddReferral()">+ Add Referral</button>
                         <button class="btn btn-secondary" onclick="loadReferrals()">Refresh</button>
                     </div>
-
                     <div class="table-container">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Customer Name</th>
-                                    <th>Phone Number</th>
-                                    <th>Business</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="referralsTable">
-                                <tr>
-                                    <td colspan="5" style="text-align: center; color: #666; padding: 48px 16px;">
-                                        Loading referrals...
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <thead><tr><th>Customer Name</th><th>Phone</th><th>Business</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="referralsTable"><tr><td colspan="5" style="text-align: center; color: #666;">Loading...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
-
-                <!-- Rewards Page -->
-                <div id="rewardsPage" class="page">
-                    <div class="header">
-                        <h1>Rewards</h1>
-                    </div>
-                    <div style="padding: 32px; text-align: center; color: #666;">
-                        <p>Rewards section coming soon</p>
-                    </div>
-                </div>
-
-                <!-- Analytics Page -->
-                <div id="analyticsPage" class="page">
-                    <div class="header">
-                        <h1>Analytics</h1>
-                    </div>
-                    <div style="padding: 32px; text-align: center; color: #666;">
-                        <p>Analytics section coming soon</p>
-                    </div>
-                </div>
-
-                <!-- Profile Page -->
+                <div id="rewardsPage" class="page"><div class="header"><h1>Rewards</h1></div><div style="padding: 32px; text-align: center; color: #666;"><p>Coming soon</p></div></div>
+                <div id="analyticsPage" class="page"><div class="header"><h1>Analytics</h1></div><div style="padding: 32px; text-align: center; color: #666;"><p>Coming soon</p></div></div>
                 <div id="profilePage" class="page">
-                    <div class="profile-header">
-                        <h1>My Profile</h1>
-                        <button class="profile-back-btn" onclick="closeProfilePage(event)">← Back to Referrals</button>
-                    </div>
-
+                    <div class="profile-header"><h1>My Profile</h1><button class="profile-back-btn" onclick="closeProfilePage(event)">← Back</button></div>
                     <div class="profile-form">
                         <form id="profileForm">
-                            <div class="form-group">
-                                <label for="profileContactName">Contact Name</label>
-                                <input type="text" id="profileContactName" placeholder="Enter your full name">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="profileContactPhone">Contact Phone Number</label>
-                                <input type="tel" id="profileContactPhone" placeholder="Enter your phone number">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="profileBusinessName">Business Name</label>
-                                <input type="text" id="profileBusinessName" placeholder="Enter your business name">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="profileBusinessEmail">Business Email Address</label>
-                                <input type="email" id="profileBusinessEmail" placeholder="Enter business email">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="profileABN">Business ABN</label>
-                                <input type="text" id="profileABN" placeholder="Enter ABN (11 digits)">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="profileNotes">Additional Notes About Your Business</label>
-                                <textarea id="profileNotes" style="resize: vertical; min-height: 120px;" placeholder="Tell us more about your business..."></textarea>
-                            </div>
-
+                            <div class="form-group"><label>Contact Name</label><input type="text" id="profileContactName"></div>
+                            <div class="form-group"><label>Phone</label><input type="tel" id="profileContactPhone"></div>
+                            <div class="form-group"><label>Business Name</label><input type="text" id="profileBusinessName"></div>
+                            <div class="form-group"><label>Email</label><input type="email" id="profileBusinessEmail"></div>
+                            <div class="form-group"><label>ABN</label><input type="text" id="profileABN"></div>
+                            <div class="form-group"><label>Notes</label><textarea id="profileNotes"></textarea></div>
                             <div class="profile-footer">
                                 <button type="button" class="btn btn-secondary" onclick="closeProfilePage(event)">Cancel</button>
-                                <button type="button" class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+                                <button type="button" class="btn btn-primary" onclick="saveProfile()">Save</button>
                             </div>
                         </form>
                     </div>
@@ -752,399 +163,168 @@
         </div>
     </div>
 
-    <!-- Add Referral Modal -->
     <div class="modal" id="addReferralModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add new referral</h2>
-                <p>Submit a new customer referral to earn rewards</p>
-            </div>
-
+            <div class="modal-header"><h2>Add new referral</h2></div>
             <form id="referralForm" onsubmit="handleAddReferral(event)">
-                <div class="form-group">
-                    <label for="customerName">Customer name</label>
-                    <input type="text" id="customerName" required placeholder="Enter customer full name">
-                </div>
-
-                <div class="form-group">
-                    <label for="phoneNumber">Phone number</label>
-                    <input type="tel" id="phoneNumber" required placeholder="Enter phone number">
-                </div>
-
-                <div class="form-group">
-                    <label for="business">Business</label>
-                    <input type="text" id="business" required placeholder="Enter business name">
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email (optional)</label>
-                    <input type="email" id="email" placeholder="Enter email address">
-                </div>
-
-                <div class="form-group">
-                    <label for="notes">Notes (optional)</label>
-                    <textarea id="notes" style="resize: vertical; min-height: 80px;" placeholder="Add any additional information..."></textarea>
-                </div>
-
+                <div class="form-group"><label>Customer name</label><input type="text" id="customerName" required></div>
+                <div class="form-group"><label>Phone</label><input type="tel" id="phoneNumber" required></div>
+                <div class="form-group"><label>Business</label><input type="text" id="business" required></div>
+                <div class="form-group"><label>Email (optional)</label><input type="email" id="email"></div>
+                <div class="form-group"><label>Notes (optional)</label><textarea id="notes"></textarea></div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeAddReferral()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add referral</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        // Hardcoded users data
-        const HARDCODED_USERS = [
-            {
-                "id": "1",
-                "email": "tristankgg@gmail.com",
-                "password": "password123!",
-                "profile": {
-                    "contactName": "Tristan Gallagher",
-                    "contactPhone": "",
-                    "businessName": "Kitchen Installation Co.",
-                    "businessEmail": "",
-                    "abn": "",
-                    "notes": ""
-                }
-            }
-        ];
+        const HARDCODED_USERS = [{"id":"1","email":"tristankgg@gmail.com","password":"password123!","profile":{"contactName":"Tristan Gallagher","contactPhone":"","businessName":"Kitchen Installation Co.","businessEmail":"","abn":"","notes":""}}];
+        const SHEET_ID = '1JxnbpBYh-Ab7m9sAaoYz0uNyDOYSWlr8NAL5JJdxnOo';
+        const API_KEY = 'AIzaSyCTqqCFkw0n3sCMuP6RM56c3mwzRp9LPyA';
 
-        // GitHub Configuration
-        const GITHUB_OWNER = 'tristankgg';
-        const GITHUB_REPO = 'sig_portal';
-        const REFERRALS_FILE = 'data/referrals.json';
+        let currentUser = null, referrals = [];
 
-        let currentUser = null;
-        let referrals = [];
-        let GITHUB_TOKEN = '';
-        let referralsFileSha = null;
-
-        // Initialize
         window.addEventListener('load', () => {
-            const savedToken = localStorage.getItem('githubToken');
-            if (savedToken) {
-                GITHUB_TOKEN = savedToken;
-                document.getElementById('githubToken').value = '••••••••••••••••';
-                checkSession();
-            } else {
-                showLogin();
-            }
+            const s = localStorage.getItem('userSession');
+            if (s) { currentUser = JSON.parse(s); showApp(); updateUserDisplay(); loadReferrals(); }
+            else showLogin();
         });
 
-        // Save token when user enters it
-        document.addEventListener('change', (e) => {
-            if (e.target.id === 'githubToken') {
-                GITHUB_TOKEN = e.target.value;
-                if (GITHUB_TOKEN && GITHUB_TOKEN !== '••••••••••••••••') {
-                    localStorage.setItem('githubToken', GITHUB_TOKEN);
-                }
-            }
-        });
-
-        function checkSession() {
-            const sessionData = localStorage.getItem('userSession');
-            if (sessionData && GITHUB_TOKEN) {
-                currentUser = JSON.parse(sessionData);
-                showApp();
-                updateUserDisplay();
-                loadReferrals();
-            } else {
-                showLogin();
-            }
-        }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-            
-            if (!GITHUB_TOKEN || GITHUB_TOKEN === '••••••••••••••••') {
-                showNotification('Please enter your GitHub token', 'error');
-                return;
-            }
-
+        function handleLogin(e) {
+            e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
-            const btn = document.getElementById('loginBtn');
-
-            errorDiv.classList.remove('show');
-            btn.disabled = true;
-            btn.textContent = 'Signing in...';
-
-            try {
-                const user = HARDCODED_USERS.find(u => u.email === email && u.password === password);
-
-                if (!user) {
-                    errorDiv.textContent = 'Invalid email or password';
-                    errorDiv.classList.add('show');
-                    btn.disabled = false;
-                    btn.textContent = 'Sign In';
-                    return;
-                }
-
-                currentUser = {
-                    id: user.id,
-                    email: user.email,
-                    profile: user.profile
-                };
-
-                localStorage.setItem('userSession', JSON.stringify(currentUser));
-                localStorage.setItem('githubToken', GITHUB_TOKEN);
-                showApp();
-                updateUserDisplay();
-                loadReferrals();
-                showNotification('Welcome back!');
-            } catch (error) {
-                console.error('Login error:', error);
-                errorDiv.textContent = 'Login failed: ' + error.message;
-                errorDiv.classList.add('show');
-                btn.disabled = false;
-                btn.textContent = 'Sign In';
-            }
+            const user = HARDCODED_USERS.find(u => u.email === email && u.password === password);
+            if (!user) { document.getElementById('loginError').textContent = 'Invalid credentials'; document.getElementById('loginError').classList.add('show'); return; }
+            currentUser = {id: user.id, email: user.email, profile: user.profile};
+            localStorage.setItem('userSession', JSON.stringify(currentUser));
+            showApp();
+            updateUserDisplay();
+            loadReferrals();
+            showNotification('Welcome back!');
         }
 
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('userSession');
-                currentUser = null;
-                referrals = [];
-                showLogin();
-                document.getElementById('loginEmail').value = 'tristankgg@gmail.com';
-                document.getElementById('loginPassword').value = 'password123!';
-            }
-        }
+        function logout() { if (confirm('Logout?')) { localStorage.removeItem('userSession'); currentUser = null; referrals = []; showLogin(); } }
+        function showLogin() { document.getElementById('loginContainer').style.display = 'flex'; document.getElementById('appContainer').classList.remove('active'); }
+        function showApp() { document.getElementById('loginContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); }
 
-        function showLogin() {
-            document.getElementById('loginContainer').style.display = 'flex';
-            document.getElementById('appContainer').classList.remove('active');
-        }
-
-        function showApp() {
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('appContainer').classList.add('active');
-        }
-
-        function updateUserDisplay() {
-            const name = currentUser.profile.contactName;
-            const company = currentUser.profile.businessName;
-            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-
-            document.getElementById('userDisplayName').textContent = name;
-            document.getElementById('userDisplayCompany').textContent = company;
-            document.getElementById('userAvatarMain').textContent = initials;
-        }
+        function updateUserDisplay() { const name = currentUser.profile.contactName; const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2); document.getElementById('userDisplayName').textContent = name; document.getElementById('userDisplayCompany').textContent = currentUser.profile.businessName; document.getElementById('userAvatarMain').textContent = initials; }
 
         async function loadReferrals() {
             try {
-                const response = await fetch(
-                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${REFERRALS_FILE}`,
-                    {
-                        headers: {
-                            'Authorization': `token ${GITHUB_TOKEN}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    }
-                );
-
-                if (!response.ok) {
-                    referrals = [];
-                    updateTable();
-                    return;
-                }
-
-                const fileData = await response.json();
-                referralsFileSha = fileData.sha;
-                const content = atob(fileData.content);
-                const data = JSON.parse(content);
-                referrals = (data.referrals || []).filter(ref => ref.userId === currentUser.id);
-                updateTable();
-                showNotification('Referrals loaded from GitHub!');
-            } catch (error) {
-                console.error('Error loading referrals:', error);
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:I?key=${API_KEY}`;
+                const response = await fetch(url);
+                const data = await response.json();
                 referrals = [];
-                updateTable();
-            }
-        }
-
-        async function saveReferralsToGitHub() {
-            try {
-                // Get all referrals (for all users)
-                let allReferrals = [];
-                let fileSha = null;
-
-                try {
-                    const getResponse = await fetch(
-                        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${REFERRALS_FILE}`,
-                        {
-                            headers: {
-                                'Authorization': `token ${GITHUB_TOKEN}`,
-                                'Accept': 'application/vnd.github.v3+json'
-                            }
+                if (data.values && data.values.length > 1) {
+                    for (let i = 1; i < data.values.length; i++) {
+                        const row = data.values[i];
+                        if (row[1] === currentUser.id) {
+                            referrals.push({
+                                id: parseInt(row[0]) || i,
+                                userId: row[1],
+                                customerName: row[2] || '',
+                                phoneNumber: row[3] || '',
+                                business: row[4] || '',
+                                email: row[5] || '',
+                                notes: row[6] || '',
+                                status: row[7] || 'pending',
+                                dateAdded: row[8] || new Date().toLocaleDateString(),
+                                rowIndex: i + 1
+                            });
                         }
-                    );
-
-                    if (getResponse.ok) {
-                        const fileData = await getResponse.json();
-                        fileSha = fileData.sha;
-                        const content = atob(fileData.content);
-                        const data = JSON.parse(content);
-                        allReferrals = data.referrals || [];
                     }
-                } catch (e) {
-                    console.log('File does not exist yet');
                 }
-
-                // Remove old referrals from this user
-                allReferrals = allReferrals.filter(ref => ref.userId !== currentUser.id);
-
-                // Add current user's referrals
-                allReferrals = [...allReferrals, ...referrals];
-
-                // Save to GitHub
-                const fileContent = JSON.stringify({ referrals: allReferrals }, null, 2);
-                const encodedContent = btoa(fileContent);
-
-                const putResponse = await fetch(
-                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${REFERRALS_FILE}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${GITHUB_TOKEN}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            message: `Update referrals for user ${currentUser.id}`,
-                            content: encodedContent,
-                            ...(fileSha && { sha: fileSha })
-                        })
-                    }
-                );
-
-                if (!putResponse.ok) {
-                    const error = await putResponse.json();
-                    throw new Error(error.message || 'Failed to save');
-                }
-
-                const result = await putResponse.json();
-                referralsFileSha = result.content.sha;
-                console.log('Referrals saved to GitHub');
-            } catch (error) {
-                console.error('Error saving to GitHub:', error);
-                showNotification('Failed to save to GitHub: ' + error.message, 'error');
-            }
-        }
-
-        function openAddReferral() {
-            document.getElementById('addReferralModal').classList.add('active');
-        }
-
-        function closeAddReferral() {
-            document.getElementById('addReferralModal').classList.remove('active');
-            document.getElementById('referralForm').reset();
-        }
-
-        async function handleAddReferral(event) {
-            event.preventDefault();
-
-            const referral = {
-                id: Date.now(),
-                userId: currentUser.id,
-                customerName: document.getElementById('customerName').value,
-                phoneNumber: document.getElementById('phoneNumber').value,
-                business: document.getElementById('business').value,
-                email: document.getElementById('email').value,
-                notes: document.getElementById('notes').value,
-                status: 'pending',
-                dateAdded: new Date().toLocaleDateString()
-            };
-
-            try {
-                referrals.push(referral);
-                await saveReferralsToGitHub();
-                closeAddReferral();
                 updateTable();
-                showNotification('Referral added successfully!');
-            } catch (error) {
-                showNotification('Failed to add referral: ' + error.message, 'error');
-                referrals = referrals.filter(r => r.id !== referral.id);
-            }
+                showNotification('Referrals loaded from Google Sheets!');
+            } catch (e) { console.log(e); referrals = []; updateTable(); showNotification('Failed to load referrals', 'error'); }
         }
 
-        async function deleteReferral(id) {
-            if (confirm('Are you sure you want to delete this referral?')) {
-                try {
-                    referrals = referrals.filter(ref => ref.id !== id);
-                    await saveReferralsToGitHub();
-                    updateTable();
-                    showNotification('Referral deleted!');
-                } catch (error) {
-                    showNotification('Failed to delete referral', 'error');
-                    loadReferrals();
-                }
+        async function addReferralToSheet(ref) {
+            try {
+                const values = [[ref.id, ref.userId, ref.customerName, ref.phoneNumber, ref.business, ref.email, ref.notes, ref.status, ref.dateAdded]];
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:I/append?valueInputOption=RAW&key=${API_KEY}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ values: values })
+                });
+                if (!response.ok) throw new Error('Failed to add referral');
+            } catch (e) { console.error(e); showNotification('Failed to save: ' + e.message, 'error'); }
+        }
+
+        async function deleteReferralFromSheet(rowIndex) {
+            try {
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/batchUpdate?key=${API_KEY}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        requests: [{
+                            deleteDimension: {
+                                range: {
+                                    sheetId: 0,
+                                    dimension: 'ROWS',
+                                    startIndex: rowIndex - 1,
+                                    endIndex: rowIndex
+                                }
+                            }
+                        }]
+                    })
+                });
+                if (!response.ok) throw new Error('Failed to delete');
+            } catch (e) { console.error(e); showNotification('Failed to delete: ' + e.message, 'error'); }
+        }
+
+        function openAddReferral() { document.getElementById('addReferralModal').classList.add('active'); }
+        function closeAddReferral() { document.getElementById('addReferralModal').classList.remove('active'); document.getElementById('referralForm').reset(); }
+
+        async function handleAddReferral(e) {
+            e.preventDefault();
+            const ref = {id: Date.now(), userId: currentUser.id, customerName: document.getElementById('customerName').value, phoneNumber: document.getElementById('phoneNumber').value, business: document.getElementById('business').value, email: document.getElementById('email').value, notes: document.getElementById('notes').value, status: 'pending', dateAdded: new Date().toLocaleDateString()};
+            await addReferralToSheet(ref);
+            closeAddReferral();
+            loadReferrals();
+            showNotification('Referral added!');
+        }
+
+        async function deleteReferral(id, rowIndex) {
+            if (confirm('Delete?')) {
+                await deleteReferralFromSheet(rowIndex);
+                loadReferrals();
             }
         }
 
         function updateTable() {
             const tbody = document.getElementById('referralsTable');
-            
-            if (referrals.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" style="text-align: center; color: #666; padding: 48px 16px;">
-                            No referrals yet. Click "Add Referral" to get started.
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            tbody.innerHTML = referrals.map(ref => `
-                <tr>
-                    <td>${ref.customerName}</td>
-                    <td>${ref.phoneNumber}</td>
-                    <td>${ref.business}</td>
-                    <td>
-                        <span class="status-badge status-${ref.status}">
-                            ${ref.status.charAt(0).toUpperCase() + ref.status.slice(1)}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="action-icons">
-                            <button class="action-btn" title="Delete" onclick="deleteReferral(${ref.id})" style="border: none; background: none; cursor: pointer;">🗑</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+            if (!referrals.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #666;">No referrals yet</td></tr>'; return; }
+            tbody.innerHTML = referrals.map(ref => `<tr><td>${ref.customerName}</td><td>${ref.phoneNumber}</td><td>${ref.business}</td><td><span class="status-badge status-${ref.status}">${ref.status}</span></td><td><button class="action-btn" onclick="deleteReferral(${ref.id}, ${ref.rowIndex})">🗑</button></td></tr>`).join('');
         }
 
-        function navigateTo(page, event) {
-            event.preventDefault();
+        function navigateTo(page, e) {
+            e.preventDefault();
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(page + 'Page').classList.add('active');
-
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            event.target.classList.add('active');
+            e.target.classList.add('active');
         }
 
-        function openProfilePage(event) {
-            event.preventDefault();
+        function openProfilePage(e) {
+            e.preventDefault();
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('profilePage').classList.add('active');
-
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            event.target.classList.add('active');
-
+            e.target.classList.add('active');
             loadProfileData();
         }
 
-        function closeProfilePage(event) {
-            event.preventDefault();
+        function closeProfilePage(e) {
+            e.preventDefault();
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('referralsPage').classList.add('active');
-
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             document.querySelector('[onclick*="referrals"]').classList.add('active');
         }
@@ -1167,30 +347,22 @@
                 abn: document.getElementById('profileABN').value,
                 notes: document.getElementById('profileNotes').value
             };
-
             currentUser.profile = profile;
             localStorage.setItem('userSession', JSON.stringify(currentUser));
             updateUserDisplay();
             closeProfilePage(new Event('click'));
-            showNotification('Profile saved successfully!');
+            showNotification('Profile saved!');
         }
 
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
+        function showNotification(msg, type = 'success') {
+            const n = document.createElement('div');
+            n.className = `notification ${type}`;
+            n.textContent = msg;
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 3000);
         }
 
-        document.getElementById('addReferralModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeAddReferral();
-            }
-        });
+        document.getElementById('addReferralModal').addEventListener('click', e => { if (e.target.id === 'addReferralModal') closeAddReferral(); });
     </script>
 </body>
 </html>
