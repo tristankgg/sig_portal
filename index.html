@@ -191,6 +191,7 @@
         const SHEET_ID = '1JxnbpBYh-Ab7m9sAaoYz0uNyDOYSWlr8NAL5JJdxnOo';
         const API_KEY = 'AIzaSyCTqqCFkw0n3sCMuP6RM56c3mwzRp9LPyA';
         const SHEET_NAME = 'Referrals';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNngjBuUcoTRVGhURid-R_kP5lccNdAXNxbUKiP8lQNGgO0R-zJ1z7GfKQJ5fQjsEx/exec';
 
         let currentUser = null, referrals = [];
 
@@ -246,21 +247,28 @@
                     }
                 }
                 updateTable();
-                showNotification('Referrals loaded from Google Sheets!', 'success');
+                showNotification('Referrals loaded!', 'success');
             } catch (e) { console.log(e); referrals = []; updateTable(); showNotification('Failed to load referrals', 'error'); }
         }
 
         async function addReferralToSheet(ref) {
             try {
-                const values = [[ref.id.toString(), ref.userId, ref.customerName, ref.phoneNumber, ref.business, ref.email, ref.notes, ref.status, ref.dateAdded]];
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A:I:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS&key=${API_KEY}`;
-                const response = await fetch(url, {
+                const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ values: values })
+                    body: JSON.stringify({
+                        id: ref.id.toString(),
+                        userId: ref.userId,
+                        customerName: ref.customerName,
+                        phoneNumber: ref.phoneNumber,
+                        business: ref.business,
+                        email: ref.email,
+                        notes: ref.notes,
+                        status: ref.status,
+                        dateAdded: ref.dateAdded
+                    })
                 });
-                const responseData = await response.json();
-                if (response.status !== 200) throw new Error(responseData.error?.message || 'Failed to add referral');
                 return true;
             } catch (e) { console.error('Error:', e); throw e; }
         }
@@ -298,7 +306,7 @@
             try {
                 await addReferralToSheet(ref);
                 closeAddReferral();
-                loadReferrals();
+                setTimeout(() => loadReferrals(), 1000);
                 showNotification('Referral added successfully!', 'success');
             } catch (err) {
                 showNotification('Error: ' + err.message, 'error');
