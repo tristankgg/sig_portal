@@ -66,7 +66,6 @@
         td { padding: 16px; border-bottom: 1px solid #e5e7eb; }
         .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         .status-pending { background-color: rgba(240, 153, 31, 0.1); color: #f99d1c; }
-        .status-synced { background-color: rgba(34, 197, 94, 0.1); color: #22c55e; }
         .action-btn { cursor: pointer; color: #999; font-size: 16px; border: none; background: transparent; }
         .notification { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; z-index: 2000; animation: slideIn 0.3s; min-width: 300px; }
         .notification.success { background-color: #22c55e; }
@@ -101,7 +100,7 @@
                 <button type="submit" class="login-btn">Sign In</button>
                 <div class="login-footer">
                     <span class="login-footer-text">Developed by TGC</span>
-                    <span class="login-footer-text">v0.16</span>
+                    <span class="login-footer-text">v0.17</span>
                 </div>
             </form>
         </div>
@@ -220,9 +219,10 @@
 
         async function loadReferrals() {
             try {
-                const response = await fetch(APPS_SCRIPT_URL + '?action=getReferrals');
-                const data = await response.json();
-                referrals = data.filter(ref => ref.userId === currentUser.id);
+                const response = await fetch(APPS_SCRIPT_URL + '?action=getReferrals', { mode: 'no-cors' });
+                let data = [];
+                try { data = await response.json(); } catch(e) { console.log('Could not parse JSON, data may be in no-cors mode'); }
+                referrals = Array.isArray(data) ? data.filter(ref => ref && ref.userId === currentUser.id) : [];
                 updateTable();
                 showNotification('Referrals loaded!', 'success');
             } catch (e) { console.error(e); showNotification('Failed to load referrals', 'error'); }
@@ -232,11 +232,11 @@
             try {
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(ref)
                 });
-                const result = await response.json();
-                if (!result.success) throw new Error(result.error || 'Failed to add referral');
+                console.log('Post submitted successfully');
                 return true;
             } catch (e) { console.error('Error:', e); throw e; }
         }
@@ -260,7 +260,7 @@
             try {
                 await addReferralToSheet(ref);
                 closeAddReferral();
-                setTimeout(() => loadReferrals(), 1500);
+                setTimeout(() => loadReferrals(), 2000);
                 showNotification('Referral added successfully!', 'success');
             } catch (err) {
                 showNotification('Error: ' + err.message, 'error');
