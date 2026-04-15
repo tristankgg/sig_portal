@@ -100,7 +100,7 @@
                 <button type="submit" class="login-btn">Sign In</button>
                 <div class="login-footer">
                     <span class="login-footer-text">Developed by TGC</span>
-                    <span class="login-footer-text">v0.12</span>
+                    <span class="login-footer-text">v0.13</span>
                 </div>
             </form>
         </div>
@@ -191,7 +191,7 @@
         const SHEET_ID = '1JxnbpBYh-Ab7m9sAaoYz0uNyDOYSWlr8NAL5JJdxnOo';
         const API_KEY = 'AIzaSyCTqqCFkw0n3sCMuP6RM56c3mwzRp9LPyA';
         const SHEET_NAME = 'Referrals';
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNngjBuUcoTRVGhURid-R_kP5lccNdAXNxbUKiP8lQNGgO0R-zJ1z7GfKQJ5fQjsEx/useweb';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNngjBuUcoTRVGhURid-R_kP5lccNdAXNxbUKiP8lQNGgO0R-zJ1z7GfKQJ5fQjsEx/exec';
 
         let currentUser = null, referrals = [];
 
@@ -263,10 +263,8 @@
                 params.append('status', ref.status);
                 params.append('dateAdded', ref.dateAdded);
 
-                const response = await fetch(APPS_SCRIPT_URL + '?' + params.toString(), {
-                    method: 'GET'
-                });
-                console.log('Response status:', response.status);
+                const response = await fetch(APPS_SCRIPT_URL + '?' + params.toString());
+                console.log('Apps Script response status:', response.status);
                 return true;
             } catch (e) { console.error('Error:', e); throw e; }
         }
