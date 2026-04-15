@@ -100,7 +100,7 @@
                 <button type="submit" class="login-btn">Sign In</button>
                 <div class="login-footer">
                     <span class="login-footer-text">Developed by TGC</span>
-                    <span class="login-footer-text">v0.13</span>
+                    <span class="login-footer-text">v0.14</span>
                 </div>
             </form>
         </div>
@@ -191,7 +191,6 @@
         const SHEET_ID = '1JxnbpBYh-Ab7m9sAaoYz0uNyDOYSWlr8NAL5JJdxnOo';
         const API_KEY = 'AIzaSyCTqqCFkw0n3sCMuP6RM56c3mwzRp9LPyA';
         const SHEET_NAME = 'Referrals';
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNngjBuUcoTRVGhURid-R_kP5lccNdAXNxbUKiP8lQNGgO0R-zJ1z7GfKQJ5fQjsEx/exec';
 
         let currentUser = null, referrals = [];
 
@@ -252,19 +251,16 @@
 
         async function addReferralToSheet(ref) {
             try {
-                const params = new URLSearchParams();
-                params.append('id', ref.id.toString());
-                params.append('userId', ref.userId);
-                params.append('customerName', ref.customerName);
-                params.append('phoneNumber', ref.phoneNumber);
-                params.append('business', ref.business);
-                params.append('email', ref.email);
-                params.append('notes', ref.notes);
-                params.append('status', ref.status);
-                params.append('dateAdded', ref.dateAdded);
-
-                const response = await fetch(APPS_SCRIPT_URL + '?' + params.toString());
-                console.log('Apps Script response status:', response.status);
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A:I/append?valueInputOption=RAW&key=${API_KEY}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        values: [[ref.id, ref.userId, ref.customerName, ref.phoneNumber, ref.business, ref.email, ref.notes, ref.status, ref.dateAdded]]
+                    })
+                });
+                const result = await response.json();
+                if (result.error) throw new Error(result.error.message);
                 return true;
             } catch (e) { console.error('Error:', e); throw e; }
         }
@@ -281,7 +277,7 @@
                 setTimeout(() => loadReferrals(), 2000);
                 showNotification('Referral added successfully!', 'success');
             } catch (err) {
-                showNotification('Error: ' + err.message, 'error');
+                showNotification('Error adding referral: ' + err.message, 'error');
             }
         }
 
