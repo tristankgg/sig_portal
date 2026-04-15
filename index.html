@@ -18,19 +18,13 @@
             line-height: 1.6;
         }
 
-        /* ==================== LOGIN PAGE STYLES ==================== */
         .login-container {
-            display: none;
+            display: flex;
             min-height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-        }
-
-        .login-container.active {
-            display: flex;
         }
 
         .login-box {
@@ -147,49 +141,6 @@
             display: block;
         }
 
-        .token-input-section {
-            margin-bottom: 20px;
-            padding: 16px;
-            background-color: #f0f9ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .token-input-section.show {
-            display: block;
-        }
-
-        .token-input-section label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .token-input-section input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #bfdbfe;
-            border-radius: 6px;
-            font-size: 12px;
-            font-family: monospace;
-            margin-bottom: 8px;
-        }
-
-        .token-input-section .help-text {
-            font-size: 12px;
-            color: #0369a1;
-            margin-top: 8px;
-        }
-
-        .token-input-section a {
-            color: #0369a1;
-            text-decoration: none;
-        }
-
-        /* ==================== MAIN APP STYLES ==================== */
         .app-container {
             display: none;
         }
@@ -600,14 +551,6 @@
                 <p>Signature Appliances Rewards Portal</p>
             </div>
 
-            <div class="token-input-section" id="tokenSection">
-                <label for="githubToken">GitHub Personal Access Token</label>
-                <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxx">
-                <div class="help-text">
-                    Need a token? <a href="https://github.com/settings/tokens" target="_blank">Create one here</a> (select "repo" scope)
-                </div>
-            </div>
-
             <form class="login-form" onsubmit="handleLogin(event)">
                 <div class="login-error" id="loginError"></div>
 
@@ -808,38 +751,29 @@
     </div>
 
     <script>
-        // Configuration
-        const GITHUB_OWNER = 'tristankgg';
-        const GITHUB_REPO = 'sig_portal';
-        const USERS_FILE = 'data/users.json';
-        const REFERRALS_FILE = 'data/referrals.json';
+        // Hardcoded users data - matches what's in data/users.json
+        const HARDCODED_USERS = [
+            {
+                "id": "1",
+                "email": "tristankgg@gmail.com",
+                "password": "password123!",
+                "profile": {
+                    "contactName": "Tristan Gallagher",
+                    "contactPhone": "",
+                    "businessName": "Kitchen Installation Co.",
+                    "businessEmail": "",
+                    "abn": "",
+                    "notes": ""
+                }
+            }
+        ];
 
-        let GITHUB_TOKEN = '';
         let currentUser = null;
         let referrals = [];
 
         // Initialize
         window.addEventListener('load', () => {
-            const token = localStorage.getItem('githubToken');
-            if (!token) {
-                document.getElementById('tokenSection').classList.add('show');
-            } else {
-                GITHUB_TOKEN = token;
-                checkSession();
-            }
-        });
-
-        // Token handling
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && document.getElementById('tokenSection').classList.contains('show')) {
-                const token = document.getElementById('githubToken').value;
-                if (token) {
-                    GITHUB_TOKEN = token;
-                    localStorage.setItem('githubToken', token);
-                    document.getElementById('tokenSection').classList.remove('show');
-                    checkSession();
-                }
-            }
+            checkSession();
         });
 
         function checkSession() {
@@ -857,12 +791,6 @@
         async function handleLogin(event) {
             event.preventDefault();
             
-            if (!GITHUB_TOKEN) {
-                showNotification('Please enter your GitHub token first', 'error');
-                document.getElementById('tokenSection').classList.add('show');
-                return;
-            }
-
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const errorDiv = document.getElementById('loginError');
@@ -873,18 +801,8 @@
             btn.textContent = 'Signing in...';
 
             try {
-                // Fetch users from GitHub using raw content
-                const url = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${USERS_FILE}`;
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch users file');
-                }
-
-                const text = await response.text();
-                const data = JSON.parse(text);
-
-                const user = data.users.find(u => u.email === email && u.password === password);
+                // Use hardcoded users first for testing
+                const user = HARDCODED_USERS.find(u => u.email === email && u.password === password);
 
                 if (!user) {
                     errorDiv.textContent = 'Invalid email or password';
@@ -926,12 +844,12 @@
         }
 
         function showLogin() {
-            document.getElementById('loginContainer').classList.add('active');
+            document.getElementById('loginContainer').style.display = 'flex';
             document.getElementById('appContainer').classList.remove('active');
         }
 
         function showApp() {
-            document.getElementById('loginContainer').classList.remove('active');
+            document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
         }
 
@@ -947,7 +865,7 @@
 
         async function loadReferrals() {
             try {
-                const url = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${REFERRALS_FILE}`;
+                const url = `https://raw.githubusercontent.com/tristankgg/sig_portal/main/data/referrals.json`;
                 const response = await fetch(url);
 
                 if (!response.ok) {
@@ -960,66 +878,18 @@
                 const data = JSON.parse(text);
                 referrals = (data.referrals || []).filter(ref => ref.userId === currentUser.id);
                 updateTable();
+                showNotification('Referrals synced!');
             } catch (error) {
                 console.error('Error loading referrals:', error);
-                showNotification('Failed to load referrals', 'error');
+                // Show error but don't fail completely
+                updateTable();
             }
         }
 
         async function saveReferralsToGitHub(newReferrals) {
-            try {
-                let allReferrals = [];
-                let fileSha = null;
-
-                try {
-                    const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${REFERRALS_FILE}`;
-                    const response = await fetch(url, {
-                        headers: {
-                            'Authorization': `token ${GITHUB_TOKEN}`
-                        }
-                    });
-
-                    if (response.ok) {
-                        const fileData = await response.json();
-                        fileSha = fileData.sha;
-                        const content = atob(fileData.content);
-                        const data = JSON.parse(content);
-                        allReferrals = data.referrals || [];
-                    }
-                } catch (e) {
-                    console.log('File does not exist yet');
-                }
-
-                allReferrals = allReferrals.filter(ref => ref.userId !== currentUser.id);
-                allReferrals = [...allReferrals, ...newReferrals];
-
-                const content = JSON.stringify({ referrals: allReferrals }, null, 2);
-                const encodedContent = btoa(content);
-
-                const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${REFERRALS_FILE}`;
-                const putResponse = await fetch(url, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: `Update referrals for user ${currentUser.id}`,
-                        content: encodedContent,
-                        ...(fileSha && { sha: fileSha })
-                    })
-                });
-
-                if (!putResponse.ok) {
-                    const error = await putResponse.json();
-                    throw new Error(error.message || 'Failed to save');
-                }
-
-                return true;
-            } catch (error) {
-                console.error('Error saving to GitHub:', error);
-                throw error;
-            }
+            // For now, just save to localStorage since we can't write to GitHub without authentication
+            localStorage.setItem('userReferrals_' + currentUser.id, JSON.stringify(newReferrals));
+            return true;
         }
 
         function openAddReferral() {
@@ -1047,8 +917,8 @@
             };
 
             try {
-                await saveReferralsToGitHub([referral]);
                 referrals.push(referral);
+                await saveReferralsToGitHub(referrals);
                 closeAddReferral();
                 updateTable();
                 showNotification('Referral added successfully!');
@@ -1057,43 +927,12 @@
             }
         }
 
-        async function deleteReferral(id) {
+        function deleteReferral(id) {
             if (confirm('Are you sure you want to delete this referral?')) {
-                try {
-                    referrals = referrals.filter(ref => ref.id !== id);
-
-                    const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${REFERRALS_FILE}`;
-                    const getResponse = await fetch(url, {
-                        headers: {
-                            'Authorization': `token ${GITHUB_TOKEN}`
-                        }
-                    });
-
-                    const fileData = await getResponse.json();
-                    const content = atob(fileData.content);
-                    const data = JSON.parse(content);
-                    const allReferrals = (data.referrals || []).filter(ref => ref.id !== id);
-
-                    const encodedContent = btoa(JSON.stringify({ referrals: allReferrals }, null, 2));
-
-                    await fetch(url, {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${GITHUB_TOKEN}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            message: `Delete referral ${id}`,
-                            content: encodedContent,
-                            sha: fileData.sha
-                        })
-                    });
-
-                    updateTable();
-                    showNotification('Referral deleted!');
-                } catch (error) {
-                    showNotification('Failed to delete referral', 'error');
-                }
+                referrals = referrals.filter(ref => ref.id !== id);
+                localStorage.setItem('userReferrals_' + currentUser.id, JSON.stringify(referrals));
+                updateTable();
+                showNotification('Referral deleted!');
             }
         }
 
@@ -1168,7 +1007,7 @@
             document.getElementById('profileNotes').value = currentUser.profile.notes;
         }
 
-        async function saveProfile() {
+        function saveProfile() {
             const profile = {
                 contactName: document.getElementById('profileContactName').value,
                 contactPhone: document.getElementById('profileContactPhone').value,
@@ -1178,46 +1017,11 @@
                 notes: document.getElementById('profileNotes').value
             };
 
-            try {
-                const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${USERS_FILE}`;
-                const getResponse = await fetch(url, {
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`
-                    }
-                });
-
-                const fileData = await getResponse.json();
-                const content = atob(fileData.content);
-                const data = JSON.parse(content);
-
-                const userIndex = data.users.findIndex(u => u.id === currentUser.id);
-                if (userIndex !== -1) {
-                    data.users[userIndex].profile = profile;
-                    currentUser.profile = profile;
-                }
-
-                const encodedContent = btoa(JSON.stringify(data, null, 2));
-
-                await fetch(url, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: `Update profile for user ${currentUser.id}`,
-                        content: encodedContent,
-                        sha: fileData.sha
-                    })
-                });
-
-                updateUserDisplay();
-                closeProfilePage(new Event('click'));
-                showNotification('Profile saved successfully!');
-            } catch (error) {
-                console.error('Error saving profile:', error);
-                showNotification('Failed to save profile: ' + error.message, 'error');
-            }
+            currentUser.profile = profile;
+            localStorage.setItem('userSession', JSON.stringify(currentUser));
+            updateUserDisplay();
+            closeProfilePage(new Event('click'));
+            showNotification('Profile saved successfully!');
         }
 
         function showNotification(message, type = 'success') {
