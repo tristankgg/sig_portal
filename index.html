@@ -92,6 +92,12 @@
             flex: 1;
             padding: 24px 32px;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-area {
+            flex: 1;
         }
 
         .header {
@@ -157,6 +163,15 @@
 
         .btn-secondary:hover {
             background-color: var(--color-background-tertiary);
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
         }
 
         .modal {
@@ -357,6 +372,101 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        /* Profile Panel Styles */
+        .profile-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 450px;
+            height: 100vh;
+            background-color: var(--color-background-primary);
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .profile-panel.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .profile-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--color-border-tertiary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .profile-header h2 {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .profile-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-close-btn:hover {
+            color: var(--color-text-primary);
+        }
+
+        .profile-content {
+            flex: 1;
+            padding: 32px 24px;
+        }
+
+        .profile-footer {
+            padding: 24px;
+            border-top: 1px solid var(--color-border-tertiary);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .two-column .form-group {
+            margin-bottom: 0;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .hidden-page {
+            display: none;
+        }
+
+        .hidden-page.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -370,70 +480,108 @@
             <div class="sidebar-section">
                 <div class="sidebar-label">Account</div>
                 <ul class="sidebar-menu">
-                    <li><a href="#" class="active">Referrals</a></li>
-                    <li><a href="#">Rewards</a></li>
-                    <li><a href="#">Analytics</a></li>
+                    <li><a href="#" class="nav-link active" onclick="navigateTo('referrals')">Referrals</a></li>
+                    <li><a href="#" class="nav-link" onclick="navigateTo('rewards')">Rewards</a></li>
+                    <li><a href="#" class="nav-link" onclick="navigateTo('analytics')">Analytics</a></li>
                 </ul>
             </div>
 
             <div class="sidebar-section">
                 <div class="sidebar-label">Settings</div>
                 <ul class="sidebar-menu">
-                    <li><a href="#">Profile</a></li>
-                    <li><a href="#">Company Info</a></li>
-                    <li><a href="#">Preferences</a></li>
+                    <li><a href="#" class="nav-link" onclick="openProfilePanel()">My Profile</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="main-content">
-            <div class="header">
-                <h1>Referrals</h1>
-                <div class="user-info">
-                    <div>
-                        <div style="font-size: 14px; font-weight: 500;">Tristan Gallagher</div>
-                        <div style="font-size: 12px; color: var(--color-text-secondary);">Kitchen Installation Co.</div>
+            <div class="content-area">
+                <!-- Referrals Page -->
+                <div id="referralsPage" class="page active">
+                    <div class="header">
+                        <h1>Referrals</h1>
+                        <div class="user-info">
+                            <div>
+                                <div style="font-size: 14px; font-weight: 500;" id="userDisplayName">Tristan Gallagher</div>
+                                <div style="font-size: 12px; color: var(--color-text-secondary);" id="userDisplayCompany">Kitchen Installation Co.</div>
+                            </div>
+                            <div class="user-avatar">TG</div>
+                        </div>
                     </div>
-                    <div class="user-avatar">TG</div>
+
+                    <div class="controls">
+                        <button class="btn btn-primary" onclick="openAddReferral()">+ Add Referral</button>
+                        <button class="btn btn-secondary" onclick="refreshTable()">Refresh</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Phone Number</th>
+                                    <th>Business</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="referralsTable">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: var(--color-text-secondary); padding: 48px 16px;">
+                                        No referrals yet. Click "Add Referral" to get started.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination">
+                            <div style="font-size: 12px; color: var(--color-text-secondary);">0 referrals</div>
+                            <div class="pagination-controls">
+                                <button class="pagination-btn" disabled>‹</button>
+                                <span style="font-size: 12px;">1 of 1</span>
+                                <button class="pagination-btn" disabled>›</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="controls">
-                <button class="btn btn-primary" onclick="openAddReferral()">+ Add Referral</button>
-                <button class="btn btn-secondary" onclick="refreshTable()">Refresh</button>
-            </div>
+                <!-- Rewards Page -->
+                <div id="rewardsPage" class="page hidden-page">
+                    <div class="header">
+                        <h1>Rewards</h1>
+                        <div class="user-info">
+                            <div>
+                                <div style="font-size: 14px; font-weight: 500;" id="userDisplayName2">Tristan Gallagher</div>
+                                <div style="font-size: 12px; color: var(--color-text-secondary);" id="userDisplayCompany2">Kitchen Installation Co.</div>
+                            </div>
+                            <div class="user-avatar">TG</div>
+                        </div>
+                    </div>
+                    <div style="padding: 32px; text-align: center; color: var(--color-text-secondary);">
+                        <p>Rewards section coming soon</p>
+                    </div>
+                </div>
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Customer Name</th>
-                            <th>Phone Number</th>
-                            <th>Business</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="referralsTable">
-                        <tr>
-                            <td colspan="5" style="text-align: center; color: var(--color-text-secondary); padding: 48px 16px;">
-                                No referrals yet. Click "Add Referral" to get started.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="pagination">
-                    <div style="font-size: 12px; color: var(--color-text-secondary);">0 referrals</div>
-                    <div class="pagination-controls">
-                        <button class="pagination-btn" disabled>‹</button>
-                        <span style="font-size: 12px;">1 of 1</span>
-                        <button class="pagination-btn" disabled>›</button>
+                <!-- Analytics Page -->
+                <div id="analyticsPage" class="page hidden-page">
+                    <div class="header">
+                        <h1>Analytics</h1>
+                        <div class="user-info">
+                            <div>
+                                <div style="font-size: 14px; font-weight: 500;" id="userDisplayName3">Tristan Gallagher</div>
+                                <div style="font-size: 12px; color: var(--color-text-secondary);" id="userDisplayCompany3">Kitchen Installation Co.</div>
+                            </div>
+                            <div class="user-avatar">TG</div>
+                        </div>
+                    </div>
+                    <div style="padding: 32px; text-align: center; color: var(--color-text-secondary);">
+                        <p>Analytics section coming soon</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Add Referral Modal -->
     <div class="modal" id="addReferralModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -475,9 +623,122 @@
         </div>
     </div>
 
+    <!-- Profile Panel -->
+    <div class="profile-panel" id="profilePanel">
+        <div class="profile-header">
+            <h2>My Profile</h2>
+            <button class="profile-close-btn" onclick="closeProfilePanel()">×</button>
+        </div>
+
+        <div class="profile-content">
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="profileContactName">Contact Name</label>
+                    <input type="text" id="profileContactName" placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="profileContactPhone">Contact Phone Number</label>
+                    <input type="tel" id="profileContactPhone" placeholder="Enter your phone number">
+                </div>
+
+                <div class="form-group">
+                    <label for="profileBusinessName">Business Name</label>
+                    <input type="text" id="profileBusinessName" placeholder="Enter your business name">
+                </div>
+
+                <div class="form-group">
+                    <label for="profileBusinessEmail">Business Email Address</label>
+                    <input type="email" id="profileBusinessEmail" placeholder="Enter business email">
+                </div>
+
+                <div class="form-group">
+                    <label for="profileABN">Business ABN</label>
+                    <input type="text" id="profileABN" placeholder="Enter ABN (11 digits)">
+                </div>
+
+                <div class="form-group">
+                    <label for="profileNotes">Additional Notes About Your Business</label>
+                    <textarea id="profileNotes" style="resize: vertical; min-height: 100px;" placeholder="Tell us more about your business..."></textarea>
+                </div>
+            </form>
+        </div>
+
+        <div class="profile-footer">
+            <button class="btn btn-secondary" onclick="closeProfilePanel()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+        </div>
+    </div>
+
     <script>
         let referrals = [];
+        let userProfile = {
+            contactName: 'Tristan Gallagher',
+            contactPhone: '',
+            businessName: 'Kitchen Installation Co.',
+            businessEmail: '',
+            abn: '',
+            notes: ''
+        };
 
+        // Navigation
+        function navigateTo(page) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page'));
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show selected page
+            const pageElement = document.getElementById(page + 'Page');
+            if (pageElement) {
+                pageElement.classList.add('active');
+                pageElement.classList.remove('hidden-page');
+            }
+        }
+
+        // Profile Panel Functions
+        function openProfilePanel() {
+            document.getElementById('profilePanel').classList.add('active');
+            loadProfileData();
+        }
+
+        function closeProfilePanel() {
+            document.getElementById('profilePanel').classList.remove('active');
+        }
+
+        function loadProfileData() {
+            document.getElementById('profileContactName').value = userProfile.contactName;
+            document.getElementById('profileContactPhone').value = userProfile.contactPhone;
+            document.getElementById('profileBusinessName').value = userProfile.businessName;
+            document.getElementById('profileBusinessEmail').value = userProfile.businessEmail;
+            document.getElementById('profileABN').value = userProfile.abn;
+            document.getElementById('profileNotes').value = userProfile.notes;
+        }
+
+        function saveProfile() {
+            userProfile.contactName = document.getElementById('profileContactName').value;
+            userProfile.contactPhone = document.getElementById('profileContactPhone').value;
+            userProfile.businessName = document.getElementById('profileBusinessName').value;
+            userProfile.businessEmail = document.getElementById('profileBusinessEmail').value;
+            userProfile.abn = document.getElementById('profileABN').value;
+            userProfile.notes = document.getElementById('profileNotes').value;
+
+            // Update display names
+            document.getElementById('userDisplayName').textContent = userProfile.contactName;
+            document.getElementById('userDisplayName2').textContent = userProfile.contactName;
+            document.getElementById('userDisplayName3').textContent = userProfile.contactName;
+            document.getElementById('userDisplayCompany').textContent = userProfile.businessName;
+            document.getElementById('userDisplayCompany2').textContent = userProfile.businessName;
+            document.getElementById('userDisplayCompany3').textContent = userProfile.businessName;
+
+            closeProfilePanel();
+            alert('Profile saved successfully!');
+        }
+
+        // Referral Functions
         function openAddReferral() {
             document.getElementById('addReferralModal').classList.add('active');
         }
@@ -563,10 +824,20 @@
             label.textContent = `${count} ${count === 1 ? 'referral' : 'referrals'}`;
         }
 
-        // Close modal when clicking outside
+        // Modal and Panel Click Outside Handling
         document.getElementById('addReferralModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeAddReferral();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            const profilePanel = document.getElementById('profilePanel');
+            if (profilePanel.classList.contains('active') && 
+                !profilePanel.contains(e.target) && 
+                e.target.id !== 'profilePanel' &&
+                !e.target.closest('.nav-link')) {
+                closeProfilePanel();
             }
         });
     </script>
