@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<referrals>
+  <referral>
+    <id>1</id>
+    <userId>1</userId>
+    <customerName>dwq</customerName>
+    <phoneNumber>0454564564</phoneNumber>
+    <business>dwqdwq</business>
+    <email></email>
+    <notes></notes>
+    <status>pending</status>
+    <dateAdded>4/15/2026</dateAdded>
+  </referral>
+</referrals>
