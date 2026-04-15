@@ -100,7 +100,7 @@
                 <button type="submit" class="login-btn">Sign In</button>
                 <div class="login-footer">
                     <span class="login-footer-text">Developed by TGC</span>
-                    <span class="login-footer-text">v0.11</span>
+                    <span class="login-footer-text">v0.12</span>
                 </div>
             </form>
         </div>
@@ -247,54 +247,28 @@
                     }
                 }
                 updateTable();
-                showNotification('Referrals loaded!', 'success');
-            } catch (e) { console.log(e); referrals = []; updateTable(); showNotification('Failed to load referrals', 'error'); }
+            } catch (e) { console.log(e); referrals = []; updateTable(); }
         }
 
         async function addReferralToSheet(ref) {
             try {
-                const formData = new FormData();
-                formData.append('id', ref.id.toString());
-                formData.append('userId', ref.userId);
-                formData.append('customerName', ref.customerName);
-                formData.append('phoneNumber', ref.phoneNumber);
-                formData.append('business', ref.business);
-                formData.append('email', ref.email);
-                formData.append('notes', ref.notes);
-                formData.append('status', ref.status);
-                formData.append('dateAdded', ref.dateAdded);
+                const params = new URLSearchParams();
+                params.append('id', ref.id.toString());
+                params.append('userId', ref.userId);
+                params.append('customerName', ref.customerName);
+                params.append('phoneNumber', ref.phoneNumber);
+                params.append('business', ref.business);
+                params.append('email', ref.email);
+                params.append('notes', ref.notes);
+                params.append('status', ref.status);
+                params.append('dateAdded', ref.dateAdded);
 
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
+                const response = await fetch(APPS_SCRIPT_URL + '?' + params.toString(), {
+                    method: 'GET'
                 });
-                console.log('Apps Script response:', response);
+                console.log('Response status:', response.status);
                 return true;
             } catch (e) { console.error('Error:', e); throw e; }
-        }
-
-        async function deleteReferralFromSheet(rowIndex) {
-            try {
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/batchUpdate?key=${API_KEY}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        requests: [{
-                            deleteDimension: {
-                                range: {
-                                    sheetId: 0,
-                                    dimension: 'ROWS',
-                                    startIndex: rowIndex - 1,
-                                    endIndex: rowIndex
-                                }
-                            }
-                        }]
-                    })
-                });
-                const responseData = await response.json();
-                if (response.status !== 200) throw new Error(responseData.error?.message || 'Failed to delete');
-            } catch (e) { console.error(e); showNotification('Failed to delete: ' + e.message, 'error'); }
         }
 
         function openAddReferral() { document.getElementById('addReferralModal').classList.add('active'); }
@@ -313,17 +287,10 @@
             }
         }
 
-        async function deleteReferral(id, rowIndex) {
-            if (confirm('Delete?')) {
-                await deleteReferralFromSheet(rowIndex);
-                loadReferrals();
-            }
-        }
-
         function updateTable() {
             const tbody = document.getElementById('referralsTable');
             if (!referrals.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #666;">No referrals yet</td></tr>'; return; }
-            tbody.innerHTML = referrals.map(ref => `<tr><td>${ref.customerName}</td><td>${ref.phoneNumber}</td><td>${ref.business}</td><td><span class="status-badge status-${ref.status}">${ref.status}</span></td><td><button class="action-btn" onclick="deleteReferral(${ref.id}, ${ref.rowIndex})">🗑</button></td></tr>`).join('');
+            tbody.innerHTML = referrals.map(ref => `<tr><td>${ref.customerName}</td><td>${ref.phoneNumber}</td><td>${ref.business}</td><td><span class="status-badge status-${ref.status}">${ref.status}</span></td><td><button class="action-btn" onclick="return false;" style="cursor: not-allowed; opacity: 0.5;">🗑</button></td></tr>`).join('');
         }
 
         function navigateTo(page, e) {
