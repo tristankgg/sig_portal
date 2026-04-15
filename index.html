@@ -191,7 +191,7 @@
         const SHEET_ID = '1JxnbpBYh-Ab7m9sAaoYz0uNyDOYSWlr8NAL5JJdxnOo';
         const API_KEY = 'AIzaSyCTqqCFkw0n3sCMuP6RM56c3mwzRp9LPyA';
         const SHEET_NAME = 'Referrals';
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNngjBuUcoTRVGhURid-R_kP5lccNdAXNxbUKiP8lQNGgO0R-zJ1z7GfKQJ5fQjsEx/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNngjBuUcoTRVGhURid-R_kP5lccNdAXNxbUKiP8lQNGgO0R-zJ1z7GfKQJ5fQjsEx/useweb';
 
         let currentUser = null, referrals = [];
 
@@ -253,22 +253,22 @@
 
         async function addReferralToSheet(ref) {
             try {
+                const formData = new FormData();
+                formData.append('id', ref.id.toString());
+                formData.append('userId', ref.userId);
+                formData.append('customerName', ref.customerName);
+                formData.append('phoneNumber', ref.phoneNumber);
+                formData.append('business', ref.business);
+                formData.append('email', ref.email);
+                formData.append('notes', ref.notes);
+                formData.append('status', ref.status);
+                formData.append('dateAdded', ref.dateAdded);
+
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: ref.id.toString(),
-                        userId: ref.userId,
-                        customerName: ref.customerName,
-                        phoneNumber: ref.phoneNumber,
-                        business: ref.business,
-                        email: ref.email,
-                        notes: ref.notes,
-                        status: ref.status,
-                        dateAdded: ref.dateAdded
-                    })
+                    body: formData
                 });
+                console.log('Apps Script response:', response);
                 return true;
             } catch (e) { console.error('Error:', e); throw e; }
         }
@@ -306,7 +306,7 @@
             try {
                 await addReferralToSheet(ref);
                 closeAddReferral();
-                setTimeout(() => loadReferrals(), 1000);
+                setTimeout(() => loadReferrals(), 2000);
                 showNotification('Referral added successfully!', 'success');
             } catch (err) {
                 showNotification('Error: ' + err.message, 'error');
