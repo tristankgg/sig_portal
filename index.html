@@ -12,9 +12,9 @@
         }
 
         body {
-            font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-            background-color: var(--color-background-tertiary);
-            color: var(--color-text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
             line-height: 1.6;
         }
 
@@ -127,8 +127,9 @@
             box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3);
         }
 
-        .login-btn:active {
-            transform: translateY(0);
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .login-error {
@@ -164,6 +165,8 @@
             background-color: #1a1f3a;
             padding: 24px 16px;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .logo {
@@ -241,22 +244,12 @@
             background-color: rgba(255, 59, 48, 0.2);
         }
 
-        .sidebar-bottom {
-            display: flex;
-            flex-direction: column;
-            margin-top: 40px;
-        }
-
         .main-content {
             flex: 1;
             padding: 24px 32px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-        }
-
-        .content-area {
-            flex: 1;
         }
 
         .header {
@@ -315,13 +308,13 @@
         }
 
         .btn-secondary {
-            background-color: var(--color-background-secondary);
-            color: var(--color-text-primary);
-            border: 1px solid var(--color-border-tertiary);
+            background-color: white;
+            color: #333;
+            border: 1px solid #e5e7eb;
         }
 
         .btn-secondary:hover {
-            background-color: var(--color-background-tertiary);
+            background-color: #f9fafb;
         }
 
         .modal {
@@ -366,45 +359,41 @@
         }
 
         .form-group {
-            margin-bottom: 28px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
             font-size: 14px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: #333;
         }
 
         .form-group input,
-        .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 12px 14px;
+            padding: 10px 12px;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
             transition: all 0.2s;
             background-color: white;
-            color: #333;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .form-group input:focus,
-        .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
             border-color: #4a90e2;
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
         }
 
         .modal-footer {
             display: flex;
             gap: 12px;
             justify-content: flex-end;
-            margin-top: 28px;
+            margin-top: 20px;
         }
 
         .table-container {
@@ -440,10 +429,6 @@
             background-color: #f9fafb;
         }
 
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
         .status-badge {
             display: inline-block;
             padding: 4px 12px;
@@ -452,14 +437,14 @@
             font-weight: 500;
         }
 
-        .status-active {
-            background-color: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-        }
-
         .status-pending {
             background-color: rgba(240, 153, 31, 0.1);
             color: #f99d1c;
+        }
+
+        .status-active {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
         }
 
         .action-icons {
@@ -483,79 +468,34 @@
             color: #333;
         }
 
-        .pagination {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            border-top: 1px solid #e5e7eb;
-            font-size: 14px;
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
         }
 
-        .pagination-controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
+        .notification.success {
+            background-color: #22c55e;
         }
 
-        .pagination-btn {
-            width: 32px;
-            height: 32px;
-            border: 1px solid #e5e7eb;
-            background: transparent;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
+        .notification.error {
+            background-color: #ef4444;
         }
 
-        .pagination-btn:hover:not(:disabled) {
-            background-color: #f3f4f6;
-        }
-
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Profile Page Styles */
-        .profile-page {
-            display: none;
-        }
-
-        .profile-page.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .profile-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-        }
-
-        .profile-header h1 {
-            font-size: 28px;
-            font-weight: 500;
-        }
-
-        .profile-back-btn {
-            background: none;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            color: #4a90e2;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-        }
-
-        .profile-back-btn:hover {
-            background-color: rgba(74, 144, 226, 0.1);
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         .profile-form {
@@ -576,40 +516,32 @@
             border-top: 1px solid #e5e7eb;
         }
 
-        .hidden-page {
+        .page {
             display: none;
         }
 
-        .hidden-page.active {
+        .page.active {
             display: block;
         }
 
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #22c55e;
-            color: white;
-            padding: 12px 16px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 2000;
-            animation: slideInRight 0.3s ease-out;
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
         }
 
-        .notification.error {
-            background-color: #ef4444;
+        .profile-back-btn {
+            background: none;
+            border: none;
+            color: #4a90e2;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
         }
 
-        @keyframes slideInRight {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        .profile-back-btn:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -653,153 +585,127 @@
                 <div class="sidebar-section">
                     <div class="sidebar-label">Account</div>
                     <ul class="sidebar-menu">
-                        <li><a href="#" class="nav-link active" onclick="navigateTo('referrals')">Referrals</a></li>
-                        <li><a href="#" class="nav-link" onclick="navigateTo('rewards')">Rewards</a></li>
-                        <li><a href="#" class="nav-link" onclick="navigateTo('analytics')">Analytics</a></li>
+                        <li><a href="#" class="nav-link active" onclick="navigateTo('referrals', event)">Referrals</a></li>
+                        <li><a href="#" class="nav-link" onclick="navigateTo('rewards', event)">Rewards</a></li>
+                        <li><a href="#" class="nav-link" onclick="navigateTo('analytics', event)">Analytics</a></li>
                     </ul>
                 </div>
 
                 <div class="sidebar-section">
                     <div class="sidebar-label">Settings</div>
                     <ul class="sidebar-menu">
-                        <li><a href="#" class="nav-link" onclick="openProfilePage()">My Profile</a></li>
+                        <li><a href="#" class="nav-link" onclick="openProfilePage(event)">My Profile</a></li>
                     </ul>
                 </div>
 
-                <div class="sidebar-bottom">
-                    <button class="logout-btn" onclick="logout()">Logout</button>
-                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
 
             <div class="main-content">
-                <div class="content-area">
-                    <!-- Referrals Page -->
-                    <div id="referralsPage" class="page active">
-                        <div class="header">
-                            <h1>Referrals</h1>
-                            <div class="user-info">
-                                <div>
-                                    <div style="font-size: 14px; font-weight: 500;" id="userDisplayName">User</div>
-                                    <div style="font-size: 12px; color: #666;" id="userDisplayCompany">Company</div>
-                                </div>
-                                <div class="user-avatar" id="userAvatarMain">U</div>
+                <!-- Referrals Page -->
+                <div id="referralsPage" class="page active">
+                    <div class="header">
+                        <h1>Referrals</h1>
+                        <div class="user-info">
+                            <div>
+                                <div style="font-size: 14px; font-weight: 500;" id="userDisplayName">User</div>
+                                <div style="font-size: 12px; color: #666;" id="userDisplayCompany">Company</div>
                             </div>
-                        </div>
-
-                        <div class="controls">
-                            <button class="btn btn-primary" onclick="openAddReferral()">+ Add Referral</button>
-                            <button class="btn btn-secondary" onclick="loadReferrals()">Refresh</button>
-                        </div>
-
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Customer Name</th>
-                                        <th>Phone Number</th>
-                                        <th>Business</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="referralsTable">
-                                    <tr>
-                                        <td colspan="5" style="text-align: center; color: #666; padding: 48px 16px;">
-                                            Loading referrals...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="pagination">
-                                <div style="font-size: 12px; color: #666;">0 referrals</div>
-                                <div class="pagination-controls">
-                                    <button class="pagination-btn" disabled>‹</button>
-                                    <span style="font-size: 12px;">1 of 1</span>
-                                    <button class="pagination-btn" disabled>›</button>
-                                </div>
-                            </div>
+                            <div class="user-avatar" id="userAvatarMain">U</div>
                         </div>
                     </div>
 
-                    <!-- Rewards Page -->
-                    <div id="rewardsPage" class="page hidden-page">
-                        <div class="header">
-                            <h1>Rewards</h1>
-                            <div class="user-info">
-                                <div>
-                                    <div style="font-size: 14px; font-weight: 500;" id="userDisplayName2">User</div>
-                                    <div style="font-size: 12px; color: #666;" id="userDisplayCompany2">Company</div>
-                                </div>
-                                <div class="user-avatar">U</div>
-                            </div>
-                        </div>
-                        <div style="padding: 32px; text-align: center; color: #666;">
-                            <p>Rewards section coming soon</p>
-                        </div>
+                    <div class="controls">
+                        <button class="btn btn-primary" onclick="openAddReferral()">+ Add Referral</button>
+                        <button class="btn btn-secondary" onclick="loadReferrals()">Refresh</button>
                     </div>
 
-                    <!-- Analytics Page -->
-                    <div id="analyticsPage" class="page hidden-page">
-                        <div class="header">
-                            <h1>Analytics</h1>
-                            <div class="user-info">
-                                <div>
-                                    <div style="font-size: 14px; font-weight: 500;" id="userDisplayName3">User</div>
-                                    <div style="font-size: 12px; color: #666;" id="userDisplayCompany3">Company</div>
-                                </div>
-                                <div class="user-avatar">U</div>
-                            </div>
-                        </div>
-                        <div style="padding: 32px; text-align: center; color: #666;">
-                            <p>Analytics section coming soon</p>
-                        </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Phone Number</th>
+                                    <th>Business</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="referralsTable">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: #666; padding: 48px 16px;">
+                                        Loading referrals...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Rewards Page -->
+                <div id="rewardsPage" class="page">
+                    <div class="header">
+                        <h1>Rewards</h1>
+                    </div>
+                    <div style="padding: 32px; text-align: center; color: #666;">
+                        <p>Rewards section coming soon</p>
+                    </div>
+                </div>
+
+                <!-- Analytics Page -->
+                <div id="analyticsPage" class="page">
+                    <div class="header">
+                        <h1>Analytics</h1>
+                    </div>
+                    <div style="padding: 32px; text-align: center; color: #666;">
+                        <p>Analytics section coming soon</p>
+                    </div>
+                </div>
+
+                <!-- Profile Page -->
+                <div id="profilePage" class="page">
+                    <div class="profile-header">
+                        <h1>My Profile</h1>
+                        <button class="profile-back-btn" onclick="closeProfilePage(event)">← Back to Referrals</button>
                     </div>
 
-                    <!-- Profile Page -->
-                    <div id="profilePage" class="profile-page">
-                        <div class="profile-header">
-                            <h1>My Profile</h1>
-                            <button class="profile-back-btn" onclick="closeProfilePage()">← Back to Referrals</button>
-                        </div>
+                    <div class="profile-form">
+                        <form id="profileForm">
+                            <div class="form-group">
+                                <label for="profileContactName">Contact Name</label>
+                                <input type="text" id="profileContactName" placeholder="Enter your full name">
+                            </div>
 
-                        <div class="profile-form">
-                            <form id="profileForm">
-                                <div class="form-group">
-                                    <label for="profileContactName">Contact Name</label>
-                                    <input type="text" id="profileContactName" placeholder="Enter your full name">
-                                </div>
+                            <div class="form-group">
+                                <label for="profileContactPhone">Contact Phone Number</label>
+                                <input type="tel" id="profileContactPhone" placeholder="Enter your phone number">
+                            </div>
 
-                                <div class="form-group">
-                                    <label for="profileContactPhone">Contact Phone Number</label>
-                                    <input type="tel" id="profileContactPhone" placeholder="Enter your phone number">
-                                </div>
+                            <div class="form-group">
+                                <label for="profileBusinessName">Business Name</label>
+                                <input type="text" id="profileBusinessName" placeholder="Enter your business name">
+                            </div>
 
-                                <div class="form-group">
-                                    <label for="profileBusinessName">Business Name</label>
-                                    <input type="text" id="profileBusinessName" placeholder="Enter your business name">
-                                </div>
+                            <div class="form-group">
+                                <label for="profileBusinessEmail">Business Email Address</label>
+                                <input type="email" id="profileBusinessEmail" placeholder="Enter business email">
+                            </div>
 
-                                <div class="form-group">
-                                    <label for="profileBusinessEmail">Business Email Address</label>
-                                    <input type="email" id="profileBusinessEmail" placeholder="Enter business email">
-                                </div>
+                            <div class="form-group">
+                                <label for="profileABN">Business ABN</label>
+                                <input type="text" id="profileABN" placeholder="Enter ABN (11 digits)">
+                            </div>
 
-                                <div class="form-group">
-                                    <label for="profileABN">Business ABN</label>
-                                    <input type="text" id="profileABN" placeholder="Enter ABN (11 digits)">
-                                </div>
+                            <div class="form-group">
+                                <label for="profileNotes">Additional Notes About Your Business</label>
+                                <textarea id="profileNotes" style="resize: vertical; min-height: 120px;" placeholder="Tell us more about your business..."></textarea>
+                            </div>
 
-                                <div class="form-group">
-                                    <label for="profileNotes">Additional Notes About Your Business</label>
-                                    <textarea id="profileNotes" style="resize: vertical; min-height: 120px;" placeholder="Tell us more about your business..."></textarea>
-                                </div>
-
-                                <div class="profile-footer">
-                                    <button type="button" class="btn btn-secondary" onclick="closeProfilePage()">Cancel</button>
-                                    <button type="button" class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
-                                </div>
-                            </form>
-                        </div>
+                            <div class="profile-footer">
+                                <button type="button" class="btn btn-secondary" onclick="closeProfilePage(event)">Cancel</button>
+                                <button type="button" class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -850,27 +756,46 @@
 
     <script>
         // Configuration
-        const API_BASE_URL = 'http://localhost:3001'; // Change to your deployed backend URL
+        const GITHUB_OWNER = 'tristankgg';
+        const GITHUB_REPO = 'sig_portal';
+        const USERS_FILE = 'data/users.json';
+        const REFERRALS_FILE = 'data/referrals.json';
 
-        // Global variables
+        // Your GitHub Personal Access Token (read-only public access for demo)
+        let GITHUB_TOKEN = '';
+
         let currentUser = null;
         let referrals = [];
 
         // Initialize
         window.addEventListener('load', () => {
-            checkSession();
+            // Prompt for GitHub token on first load
+            const token = localStorage.getItem('githubToken');
+            if (!token) {
+                promptForGitHubToken();
+            } else {
+                GITHUB_TOKEN = token;
+                checkSession();
+            }
         });
 
-        // ==================== AUTHENTICATION ====================
+        function promptForGitHubToken() {
+            const token = prompt('Enter your GitHub Personal Access Token (with "repo" scope):\n\nGet one here: https://github.com/settings/tokens', '');
+            if (token) {
+                GITHUB_TOKEN = token;
+                localStorage.setItem('githubToken', token);
+                checkSession();
+            } else {
+                showNotification('GitHub token is required to use this app', 'error');
+            }
+        }
 
         function checkSession() {
             const sessionData = localStorage.getItem('userSession');
-            
             if (sessionData) {
-                const session = JSON.parse(sessionData);
-                currentUser = session;
+                currentUser = JSON.parse(sessionData);
                 showApp();
-                loadUserProfile();
+                updateUserDisplay();
                 loadReferrals();
             } else {
                 showLogin();
@@ -883,46 +808,53 @@
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const errorDiv = document.getElementById('loginError');
+            const btn = event.target.querySelector('button');
 
             errorDiv.classList.remove('show');
-            errorDiv.textContent = '';
+            btn.disabled = true;
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
+                // Fetch users from GitHub
+                const response = await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${USERS_FILE}`,
+                    {
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Accept': 'application/vnd.github.v3.raw'
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user data');
+                }
 
                 const data = await response.json();
+                const user = data.users.find(u => u.email === email && u.password === password);
 
-                if (!data.success) {
-                    errorDiv.textContent = data.error || 'Login failed';
+                if (!user) {
+                    errorDiv.textContent = 'Invalid email or password';
                     errorDiv.classList.add('show');
+                    btn.disabled = false;
                     return;
                 }
 
-                // Save session
                 currentUser = {
-                    id: data.user.id,
-                    email: data.user.email,
-                    profile: data.user.profile,
-                    sessionToken: data.sessionToken
+                    id: user.id,
+                    email: user.email,
+                    profile: user.profile
                 };
 
                 localStorage.setItem('userSession', JSON.stringify(currentUser));
-
-                // Show app
                 showApp();
-                loadUserProfile();
+                updateUserDisplay();
                 loadReferrals();
                 showNotification('Welcome back!');
             } catch (error) {
                 console.error('Login error:', error);
-                errorDiv.textContent = 'Unable to connect to server. Make sure the backend is running.';
+                errorDiv.textContent = 'Login failed. Check your GitHub token.';
                 errorDiv.classList.add('show');
+                btn.disabled = false;
             }
         }
 
@@ -947,22 +879,6 @@
             document.getElementById('appContainer').classList.add('active');
         }
 
-        // ==================== USER PROFILE ====================
-
-        async function loadUserProfile() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/auth/profile/${currentUser.id}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    currentUser.profile = data.profile;
-                    updateUserDisplay();
-                }
-            } catch (error) {
-                console.error('Error loading profile:', error);
-            }
-        }
-
         function updateUserDisplay() {
             const name = currentUser.profile.contactName;
             const company = currentUser.profile.businessName;
@@ -977,27 +893,246 @@
             document.getElementById('userAvatarMain').textContent = initials;
         }
 
-        function openProfilePage() {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page'));
+        async function loadReferrals() {
+            try {
+                const response = await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${REFERRALS_FILE}`,
+                    {
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Accept': 'application/vnd.github.v3.raw'
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    referrals = [];
+                    updateTable();
+                    return;
+                }
+
+                const data = await response.json();
+                referrals = (data.referrals || []).filter(ref => ref.userId === currentUser.id);
+                updateTable();
+                showNotification('Referrals synced!');
+            } catch (error) {
+                console.error('Error loading referrals:', error);
+                showNotification('Failed to load referrals', 'error');
+            }
+        }
+
+        async function saveReferralsToGitHub(newReferrals) {
+            try {
+                // Get all referrals
+                let allReferrals = [];
+                let fileSha = null;
+
+                try {
+                    const getResponse = await fetch(
+                        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${REFERRALS_FILE}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${GITHUB_TOKEN}`
+                            }
+                        }
+                    );
+
+                    if (getResponse.ok) {
+                        const fileData = await getResponse.json();
+                        fileSha = fileData.sha;
+                        const content = atob(fileData.content);
+                        const data = JSON.parse(content);
+                        allReferrals = data.referrals || [];
+                    }
+                } catch (e) {
+                    // File doesn't exist yet
+                }
+
+                // Keep referrals from other users
+                allReferrals = allReferrals.filter(ref => ref.userId !== currentUser.id);
+
+                // Add new referrals
+                allReferrals = [...allReferrals, ...newReferrals];
+
+                // Prepare content
+                const content = JSON.stringify({ referrals: allReferrals }, null, 2);
+                const encodedContent = btoa(content);
+
+                const putResponse = await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${REFERRALS_FILE}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Update referrals for user ${currentUser.id}`,
+                            content: encodedContent,
+                            ...(fileSha && { sha: fileSha })
+                        })
+                    }
+                );
+
+                if (!putResponse.ok) {
+                    throw new Error('Failed to save to GitHub');
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error saving to GitHub:', error);
+                throw error;
+            }
+        }
+
+        function openAddReferral() {
+            document.getElementById('addReferralModal').classList.add('active');
+        }
+
+        function closeAddReferral() {
+            document.getElementById('addReferralModal').classList.remove('active');
+            document.getElementById('referralForm').reset();
+        }
+
+        async function handleAddReferral(event) {
+            event.preventDefault();
+
+            const referral = {
+                id: Date.now(),
+                userId: currentUser.id,
+                customerName: document.getElementById('customerName').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                business: document.getElementById('business').value,
+                email: document.getElementById('email').value,
+                notes: document.getElementById('notes').value,
+                status: 'pending',
+                dateAdded: new Date().toLocaleDateString()
+            };
+
+            try {
+                await saveReferralsToGitHub([referral]);
+                referrals.push(referral);
+                closeAddReferral();
+                updateTable();
+                showNotification('Referral added successfully!');
+            } catch (error) {
+                showNotification('Failed to add referral', 'error');
+            }
+        }
+
+        async function deleteReferral(id) {
+            if (confirm('Are you sure you want to delete this referral?')) {
+                try {
+                    const updatedReferrals = referrals.filter(ref => ref.id !== id);
+                    referrals = updatedReferrals;
+
+                    // Get all referrals and update
+                    let allReferrals = [];
+                    let fileSha = null;
+
+                    const getResponse = await fetch(
+                        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${REFERRALS_FILE}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${GITHUB_TOKEN}`
+                            }
+                        }
+                    );
+
+                    if (getResponse.ok) {
+                        const fileData = await getResponse.json();
+                        fileSha = fileData.sha;
+                        const content = atob(fileData.content);
+                        const data = JSON.parse(content);
+                        allReferrals = (data.referrals || []).filter(ref => ref.id !== id);
+                    }
+
+                    const encodedContent = btoa(JSON.stringify({ referrals: allReferrals }, null, 2));
+
+                    await fetch(
+                        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${REFERRALS_FILE}`,
+                        {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${GITHUB_TOKEN}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                message: `Delete referral ${id}`,
+                                content: encodedContent,
+                                sha: fileSha
+                            })
+                        }
+                    );
+
+                    updateTable();
+                    showNotification('Referral deleted!');
+                } catch (error) {
+                    showNotification('Failed to delete referral', 'error');
+                }
+            }
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('referralsTable');
             
+            if (referrals.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #666; padding: 48px 16px;">
+                            No referrals yet. Click "Add Referral" to get started.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = referrals.map(ref => `
+                <tr>
+                    <td>${ref.customerName}</td>
+                    <td>${ref.phoneNumber}</td>
+                    <td>${ref.business}</td>
+                    <td>
+                        <span class="status-badge status-${ref.status}">
+                            ${ref.status.charAt(0).toUpperCase() + ref.status.slice(1)}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-icons">
+                            <button class="action-btn" title="Delete" onclick="deleteReferral(${ref.id})">🗑</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function navigateTo(page, event) {
+            event.preventDefault();
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(page + 'Page').classList.add('active');
+
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             event.target.classList.add('active');
-            
+        }
+
+        function openProfilePage(event) {
+            event.preventDefault();
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('profilePage').classList.add('active');
+
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+
             loadProfileData();
         }
 
-        function closeProfilePage() {
-            document.getElementById('profilePage').classList.remove('active');
-            
+        function closeProfilePage(event) {
+            event.preventDefault();
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page'));
             document.getElementById('referralsPage').classList.add('active');
-            document.getElementById('referralsPage').classList.remove('hidden-page');
-            
+
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            document.querySelector('.nav-link[onclick*="referrals"]').classList.add('active');
+            document.querySelector('[onclick*="referrals"]').classList.add('active');
         }
 
         function loadProfileData() {
@@ -1020,189 +1155,58 @@
             };
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/auth/profile/${currentUser.id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(profile)
-                });
+                // Get current users file
+                const getResponse = await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${USERS_FILE}`,
+                    {
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`
+                        }
+                    }
+                );
 
-                const data = await response.json();
+                const fileData = await getResponse.json();
+                const content = atob(fileData.content);
+                const data = JSON.parse(content);
 
-                if (data.success) {
-                    currentUser.profile = data.profile;
-                    updateUserDisplay();
-                    closeProfilePage();
-                    showNotification('Profile saved successfully!');
-                } else {
-                    showNotification(data.error || 'Failed to save profile', 'error');
+                // Update user profile
+                const userIndex = data.users.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    data.users[userIndex].profile = profile;
+                    currentUser.profile = profile;
                 }
+
+                // Save back to GitHub
+                const encodedContent = btoa(JSON.stringify(data, null, 2));
+
+                await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${USERS_FILE}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Update profile for user ${currentUser.id}`,
+                            content: encodedContent,
+                            sha: fileData.sha
+                        })
+                    }
+                );
+
+                updateUserDisplay();
+                closeProfilePage(new Event('click'));
+                showNotification('Profile saved successfully!');
             } catch (error) {
                 console.error('Error saving profile:', error);
                 showNotification('Failed to save profile', 'error');
             }
         }
 
-        // ==================== REFERRALS ====================
-
-        function navigateTo(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page'));
-            document.getElementById('profilePage').classList.remove('active');
-            
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            event.target.classList.add('active');
-
-            const pageElement = document.getElementById(page + 'Page');
-            if (pageElement) {
-                pageElement.classList.add('active');
-                pageElement.classList.remove('hidden-page');
-            }
-        }
-
-        function openAddReferral() {
-            document.getElementById('addReferralModal').classList.add('active');
-        }
-
-        function closeAddReferral() {
-            document.getElementById('addReferralModal').classList.remove('active');
-            document.getElementById('referralForm').reset();
-        }
-
-        async function handleAddReferral(event) {
-            event.preventDefault();
-
-            const referral = {
-                id: Date.now(),
-                customerName: document.getElementById('customerName').value,
-                phoneNumber: document.getElementById('phoneNumber').value,
-                business: document.getElementById('business').value,
-                email: document.getElementById('email').value,
-                notes: document.getElementById('notes').value,
-                status: 'pending',
-                dateAdded: new Date().toLocaleDateString()
-            };
-
-            referrals.push(referral);
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/referrals/${currentUser.id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ referrals })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    closeAddReferral();
-                    updateTable();
-                    showNotification('Referral added successfully!');
-                } else {
-                    showNotification(data.error || 'Failed to save referral', 'error');
-                }
-            } catch (error) {
-                console.error('Error saving referral:', error);
-                showNotification('Failed to save referral', 'error');
-            }
-        }
-
-        async function loadReferrals() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/referrals/${currentUser.id}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    referrals = data.referrals;
-                    updateTable();
-                    showNotification('Referrals synced!');
-                } else {
-                    showNotification(data.error || 'Failed to load referrals', 'error');
-                }
-            } catch (error) {
-                console.error('Error loading referrals:', error);
-                showNotification('Failed to load referrals', 'error');
-            }
-        }
-
-        function updateTable() {
-            const tbody = document.getElementById('referralsTable');
-            
-            if (referrals.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" style="text-align: center; color: #666; padding: 48px 16px;">
-                            No referrals yet. Click "Add Referral" to get started.
-                        </td>
-                    </tr>
-                `;
-                updatePagination();
-                return;
-            }
-
-            tbody.innerHTML = referrals.map(ref => `
-                <tr>
-                    <td>${ref.customerName}</td>
-                    <td>${ref.phoneNumber}</td>
-                    <td>${ref.business}</td>
-                    <td>
-                        <span class="status-badge status-${ref.status}">
-                            ${ref.status.charAt(0).toUpperCase() + ref.status.slice(1)}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="action-icons">
-                            <button class="action-btn" title="Edit" onclick="editReferral(${ref.id})">✎</button>
-                            <button class="action-btn" title="Delete" onclick="deleteReferral(${ref.id})">🗑</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-
-            updatePagination();
-        }
-
-        async function deleteReferral(id) {
-            if (confirm('Are you sure you want to delete this referral?')) {
-                referrals = referrals.filter(ref => ref.id !== id);
-
-                try {
-                    const response = await fetch(`${API_BASE_URL}/api/referrals/${currentUser.id}/${id}`, {
-                        method: 'DELETE'
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        updateTable();
-                        showNotification('Referral deleted!');
-                    } else {
-                        showNotification(data.error || 'Failed to delete referral', 'error');
-                    }
-                } catch (error) {
-                    console.error('Error deleting referral:', error);
-                    showNotification('Failed to delete referral', 'error');
-                }
-            }
-        }
-
-        function editReferral(id) {
-            alert('Edit functionality coming soon');
-        }
-
-        function updatePagination() {
-            const count = referrals.length;
-            const label = document.querySelector('.pagination > div:first-child');
-            label.textContent = `${count} ${count === 1 ? 'referral' : 'referrals'}`;
-        }
-
-        // Notification System
         function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
-            notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+            notification.className = `notification ${type}`;
             notification.textContent = message;
             document.body.appendChild(notification);
             
@@ -1211,7 +1215,6 @@
             }, 3000);
         }
 
-        // Modal Click Outside Handling
         document.getElementById('addReferralModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeAddReferral();
