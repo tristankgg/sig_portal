@@ -751,7 +751,7 @@
     </div>
 
     <script>
-        // Hardcoded users data - matches what's in data/users.json
+        // Hardcoded users data
         const HARDCODED_USERS = [
             {
                 "id": "1",
@@ -801,7 +801,7 @@
             btn.textContent = 'Signing in...';
 
             try {
-                // Use hardcoded users first for testing
+                // Use hardcoded users for testing
                 const user = HARDCODED_USERS.find(u => u.email === email && u.password === password);
 
                 if (!user) {
@@ -863,33 +863,39 @@
             document.getElementById('userAvatarMain').textContent = initials;
         }
 
-        async function loadReferrals() {
+        function loadReferrals() {
             try {
-                const url = `https://raw.githubusercontent.com/tristankgg/sig_portal/main/data/referrals.json`;
-                const response = await fetch(url);
-
-                if (!response.ok) {
+                // Load from localStorage with proper key format
+                const storageKey = `sig_referrals_${currentUser.id}`;
+                const stored = localStorage.getItem(storageKey);
+                
+                if (stored) {
+                    referrals = JSON.parse(stored);
+                } else {
                     referrals = [];
-                    updateTable();
-                    return;
                 }
-
-                const text = await response.text();
-                const data = JSON.parse(text);
-                referrals = (data.referrals || []).filter(ref => ref.userId === currentUser.id);
+                
                 updateTable();
-                showNotification('Referrals synced!');
+                if (stored) {
+                    showNotification('Referrals loaded!');
+                }
             } catch (error) {
                 console.error('Error loading referrals:', error);
-                // Show error but don't fail completely
+                referrals = [];
                 updateTable();
             }
         }
 
-        async function saveReferralsToGitHub(newReferrals) {
-            // For now, just save to localStorage since we can't write to GitHub without authentication
-            localStorage.setItem('userReferrals_' + currentUser.id, JSON.stringify(newReferrals));
-            return true;
+        function saveReferrals() {
+            try {
+                // Save to localStorage with proper key format
+                const storageKey = `sig_referrals_${currentUser.id}`;
+                localStorage.setItem(storageKey, JSON.stringify(referrals));
+                console.log(`Saved ${referrals.length} referrals to ${storageKey}`);
+            } catch (error) {
+                console.error('Error saving referrals:', error);
+                showNotification('Failed to save referrals', 'error');
+            }
         }
 
         function openAddReferral() {
@@ -901,7 +907,7 @@
             document.getElementById('referralForm').reset();
         }
 
-        async function handleAddReferral(event) {
+        function handleAddReferral(event) {
             event.preventDefault();
 
             const referral = {
@@ -918,7 +924,7 @@
 
             try {
                 referrals.push(referral);
-                await saveReferralsToGitHub(referrals);
+                saveReferrals();
                 closeAddReferral();
                 updateTable();
                 showNotification('Referral added successfully!');
@@ -930,7 +936,7 @@
         function deleteReferral(id) {
             if (confirm('Are you sure you want to delete this referral?')) {
                 referrals = referrals.filter(ref => ref.id !== id);
-                localStorage.setItem('userReferrals_' + currentUser.id, JSON.stringify(referrals));
+                saveReferrals();
                 updateTable();
                 showNotification('Referral deleted!');
             }
