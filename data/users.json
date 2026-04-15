@@ -1,0 +1,17 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "tristankgg@gmail.com",
+      "password": "password123!",
+      "profile": {
+        "contactName": "Tristan Gallagher",
+        "contactPhone": "",
+        "businessName": "Kitchen Installation Co.",
+        "businessEmail": "",
+        "abn": "",
+        "notes": ""
+      }
+    }
+  ]
+}
