@@ -476,6 +476,10 @@
             animation: slideInRight 0.3s ease-out;
         }
 
+        .notification.error {
+            background-color: #ef4444;
+        }
+
         @keyframes slideInRight {
             from {
                 transform: translateX(400px);
@@ -530,7 +534,7 @@
 
                     <div class="controls">
                         <button class="btn btn-primary" onclick="openAddReferral()">+ Add Referral</button>
-                        <button class="btn btn-secondary" onclick="refreshTable()">Refresh</button>
+                        <button class="btn btn-secondary" onclick="loadReferralsFromGitHub()">Sync from Server</button>
                     </div>
 
                     <div class="table-container">
@@ -547,7 +551,7 @@
                             <tbody id="referralsTable">
                                 <tr>
                                     <td colspan="5" style="text-align: center; color: var(--color-text-secondary); padding: 48px 16px;">
-                                        No referrals yet. Click "Add Referral" to get started.
+                                        Loading referrals...
                                     </td>
                                 </tr>
                             </tbody>
@@ -690,34 +694,18 @@
     </div>
 
     <script>
-        // Simple encryption/decryption using base64
-        const EncryptionService = {
-            encode: (data) => btoa(JSON.stringify(data)),
-            decode: (encoded) => JSON.parse(atob(encoded))
+        // GitHub API Configuration
+        const GITHUB_CONFIG = {
+            owner: 'tristankgg',
+            repo: 'sig_portal',
+            branch: 'main',
+            dataFile: 'data/referrals.json'
         };
 
-        // Storage Service
-        const StorageService = {
-            setReferrals: (referrals) => {
-                const encrypted = EncryptionService.encode(referrals);
-                localStorage.setItem('sig_referrals', encrypted);
-            },
-            getReferrals: () => {
-                const encrypted = localStorage.getItem('sig_referrals');
-                return encrypted ? EncryptionService.decode(encrypted) : [];
-            },
-            setProfile: (profile) => {
-                const encrypted = EncryptionService.encode(profile);
-                localStorage.setItem('sig_profile', encrypted);
-            },
-            getProfile: () => {
-                const encrypted = localStorage.getItem('sig_profile');
-                return encrypted ? EncryptionService.decode(encrypted) : null;
-            }
-        };
+        let referrals = [];
+        let referralsFileSha = null;
 
-        let referrals = StorageService.getReferrals();
-        let userProfile = StorageService.getProfile() || {
+        let userProfile = {
             contactName: 'Tristan Gallagher',
             contactPhone: '',
             businessName: 'Kitchen Installation Co.',
@@ -728,24 +716,91 @@
 
         // Initialize the page
         window.addEventListener('load', () => {
-            updateTable();
+            loadReferralsFromGitHub();
             updateUserDisplay();
         });
 
+        // Load referrals from GitHub
+        async function loadReferralsFromGitHub() {
+            try {
+                const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.dataFile}`;
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch referrals');
+                }
+
+                const data = await response.json();
+                referralsFileSha = data.sha;
+                
+                const content = atob(data.content);
+                const parsedData = JSON.parse(content);
+                referrals = parsedData.referrals || [];
+                
+                updateTable();
+                showNotification('Referrals synced from server!');
+            } catch (error) {
+                console.error('Error loading referrals:', error);
+                showNotification('Unable to load referrals from server', 'error');
+                updateTable();
+            }
+        }
+
+        // Save referrals to GitHub
+        async function saveReferralsToGitHub() {
+            try {
+                const content = JSON.stringify({ referrals: referrals }, null, 2);
+                const encodedContent = btoa(content);
+                
+                const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.dataFile}`;
+                
+                // Get current file SHA for update
+                const getResponse = await fetch(apiUrl);
+                if (getResponse.ok) {
+                    const fileData = await getResponse.json();
+                    referralsFileSha = fileData.sha;
+                }
+
+                const requestBody = {
+                    message: 'Update referrals data',
+                    content: encodedContent,
+                    branch: GITHUB_CONFIG.branch,
+                    sha: referralsFileSha
+                };
+
+                const putResponse = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!putResponse.ok) {
+                    const errorData = await putResponse.json();
+                    console.error('GitHub API Error:', errorData);
+                    throw new Error(errorData.message || 'Failed to save referrals');
+                }
+
+                const result = await putResponse.json();
+                referralsFileSha = result.content.sha;
+                showNotification('Referral saved to server!');
+            } catch (error) {
+                console.error('Error saving referrals:', error);
+                showNotification('Unable to save to server. Note: This requires GitHub authentication setup.', 'error');
+            }
+        }
+
         // Navigation
         function navigateTo(page) {
-            // Hide all pages
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page'));
-            
-            // Hide profile page
             document.getElementById('profilePage').classList.remove('active');
             
-            // Update active nav link
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             event.target.classList.add('active');
 
-            // Show selected page
             const pageElement = document.getElementById(page + 'Page');
             if (pageElement) {
                 pageElement.classList.add('active');
@@ -755,31 +810,24 @@
 
         // Profile Page Functions
         function openProfilePage() {
-            // Hide all pages
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page'));
             
-            // Update active nav link
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             event.target.classList.add('active');
             
-            // Show profile page
             document.getElementById('profilePage').classList.add('active');
-            
-            // Load profile data
             loadProfileData();
         }
 
         function closeProfilePage() {
             document.getElementById('profilePage').classList.remove('active');
             
-            // Show referrals page by default
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page'));
             document.getElementById('referralsPage').classList.add('active');
             document.getElementById('referralsPage').classList.remove('hidden-page');
             
-            // Update nav link
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             document.querySelector('.nav-link[onclick*="referrals"]').classList.add('active');
         }
@@ -801,8 +849,7 @@
             userProfile.abn = document.getElementById('profileABN').value;
             userProfile.notes = document.getElementById('profileNotes').value;
 
-            // Save to storage
-            StorageService.setProfile(userProfile);
+            localStorage.setItem('sig_profile', JSON.stringify(userProfile));
 
             updateUserDisplay();
             closeProfilePage();
@@ -843,10 +890,9 @@
             };
 
             referrals.push(referral);
-            StorageService.setReferrals(referrals);
+            saveReferralsToGitHub();
             closeAddReferral();
             updateTable();
-            showNotification('Referral added successfully!');
         }
 
         function updateTable() {
@@ -889,20 +935,13 @@
         function deleteReferral(id) {
             if (confirm('Are you sure you want to delete this referral?')) {
                 referrals = referrals.filter(ref => ref.id !== id);
-                StorageService.setReferrals(referrals);
+                saveReferralsToGitHub();
                 updateTable();
-                showNotification('Referral deleted!');
             }
         }
 
         function editReferral(id) {
             alert('Edit functionality coming soon');
-        }
-
-        function refreshTable() {
-            referrals = StorageService.getReferrals();
-            updateTable();
-            showNotification('Data refreshed!');
         }
 
         function updatePagination() {
@@ -912,9 +951,9 @@
         }
 
         // Notification System
-        function showNotification(message) {
+        function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
-            notification.className = 'notification';
+            notification.className = `notification ${type === 'error' ? 'error' : ''}`;
             notification.textContent = message;
             document.body.appendChild(notification);
             
