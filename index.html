@@ -373,77 +373,63 @@
             cursor: not-allowed;
         }
 
-        /* Profile Panel Styles */
-        .profile-panel {
+        /* Profile Page Styles */
+        .profile-page {
             display: none;
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 450px;
-            height: 100vh;
-            background-color: var(--color-background-primary);
-            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-            z-index: 999;
-            overflow-y: auto;
-            animation: slideIn 0.3s ease-out;
         }
 
-        .profile-panel.active {
+        .profile-page.active {
             display: flex;
             flex-direction: column;
         }
 
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-            }
-            to {
-                transform: translateX(0);
-            }
-        }
-
         .profile-header {
-            padding: 24px;
-            border-bottom: 1px solid var(--color-border-tertiary);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--color-border-tertiary);
         }
 
-        .profile-header h2 {
-            font-size: 20px;
+        .profile-header h1 {
+            font-size: 28px;
             font-weight: 500;
         }
 
-        .profile-close-btn {
+        .profile-back-btn {
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 16px;
             cursor: pointer;
-            color: var(--color-text-secondary);
-            padding: 0;
-            width: 32px;
-            height: 32px;
+            color: #4a90e2;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 8px;
         }
 
-        .profile-close-btn:hover {
-            color: var(--color-text-primary);
+        .profile-back-btn:hover {
+            background-color: var(--color-background-secondary);
         }
 
-        .profile-content {
-            flex: 1;
-            padding: 32px 24px;
+        .profile-form {
+            max-width: 600px;
+            background-color: var(--color-background-primary);
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid var(--color-border-tertiary);
         }
 
         .profile-footer {
-            padding: 24px;
-            border-top: 1px solid var(--color-border-tertiary);
             display: flex;
             gap: 12px;
             justify-content: flex-end;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--color-border-tertiary);
         }
 
         .two-column {
@@ -489,7 +475,7 @@
             <div class="sidebar-section">
                 <div class="sidebar-label">Settings</div>
                 <ul class="sidebar-menu">
-                    <li><a href="#" class="nav-link" onclick="openProfilePanel()">My Profile</a></li>
+                    <li><a href="#" class="nav-link" onclick="openProfilePage()">My Profile</a></li>
                 </ul>
             </div>
         </div>
@@ -577,6 +563,53 @@
                         <p>Analytics section coming soon</p>
                     </div>
                 </div>
+
+                <!-- Profile Page -->
+                <div id="profilePage" class="profile-page">
+                    <div class="profile-header">
+                        <h1>My Profile</h1>
+                        <button class="profile-back-btn" onclick="closeProfilePage()">← Back to Referrals</button>
+                    </div>
+
+                    <div class="profile-form">
+                        <form id="profileForm">
+                            <div class="form-group">
+                                <label for="profileContactName">Contact Name</label>
+                                <input type="text" id="profileContactName" placeholder="Enter your full name">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profileContactPhone">Contact Phone Number</label>
+                                <input type="tel" id="profileContactPhone" placeholder="Enter your phone number">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profileBusinessName">Business Name</label>
+                                <input type="text" id="profileBusinessName" placeholder="Enter your business name">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profileBusinessEmail">Business Email Address</label>
+                                <input type="email" id="profileBusinessEmail" placeholder="Enter business email">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profileABN">Business ABN</label>
+                                <input type="text" id="profileABN" placeholder="Enter ABN (11 digits)">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profileNotes">Additional Notes About Your Business</label>
+                                <textarea id="profileNotes" style="resize: vertical; min-height: 100px;" placeholder="Tell us more about your business..."></textarea>
+                            </div>
+
+                            <div class="profile-footer">
+                                <button type="button" class="btn btn-secondary" onclick="closeProfilePage()">Cancel</button>
+                                <button type="button" class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -623,53 +656,6 @@
         </div>
     </div>
 
-    <!-- Profile Panel -->
-    <div class="profile-panel" id="profilePanel">
-        <div class="profile-header">
-            <h2>My Profile</h2>
-            <button class="profile-close-btn" onclick="closeProfilePanel()">×</button>
-        </div>
-
-        <div class="profile-content">
-            <form id="profileForm">
-                <div class="form-group">
-                    <label for="profileContactName">Contact Name</label>
-                    <input type="text" id="profileContactName" placeholder="Enter your full name">
-                </div>
-
-                <div class="form-group">
-                    <label for="profileContactPhone">Contact Phone Number</label>
-                    <input type="tel" id="profileContactPhone" placeholder="Enter your phone number">
-                </div>
-
-                <div class="form-group">
-                    <label for="profileBusinessName">Business Name</label>
-                    <input type="text" id="profileBusinessName" placeholder="Enter your business name">
-                </div>
-
-                <div class="form-group">
-                    <label for="profileBusinessEmail">Business Email Address</label>
-                    <input type="email" id="profileBusinessEmail" placeholder="Enter business email">
-                </div>
-
-                <div class="form-group">
-                    <label for="profileABN">Business ABN</label>
-                    <input type="text" id="profileABN" placeholder="Enter ABN (11 digits)">
-                </div>
-
-                <div class="form-group">
-                    <label for="profileNotes">Additional Notes About Your Business</label>
-                    <textarea id="profileNotes" style="resize: vertical; min-height: 100px;" placeholder="Tell us more about your business..."></textarea>
-                </div>
-            </form>
-        </div>
-
-        <div class="profile-footer">
-            <button class="btn btn-secondary" onclick="closeProfilePanel()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
-        </div>
-    </div>
-
     <script>
         let referrals = [];
         let userProfile = {
@@ -687,6 +673,9 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page'));
             
+            // Hide profile page
+            document.getElementById('profilePage').classList.remove('active');
+            
             // Update active nav link
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             event.target.classList.add('active');
@@ -699,14 +688,35 @@
             }
         }
 
-        // Profile Panel Functions
-        function openProfilePanel() {
-            document.getElementById('profilePanel').classList.add('active');
+        // Profile Page Functions
+        function openProfilePage() {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page'));
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show profile page
+            document.getElementById('profilePage').classList.add('active');
+            
+            // Load profile data
             loadProfileData();
         }
 
-        function closeProfilePanel() {
-            document.getElementById('profilePanel').classList.remove('active');
+        function closeProfilePage() {
+            document.getElementById('profilePage').classList.remove('active');
+            
+            // Show referrals page by default
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page'));
+            document.getElementById('referralsPage').classList.add('active');
+            document.getElementById('referralsPage').classList.remove('hidden-page');
+            
+            // Update nav link
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.querySelector('.nav-link[onclick*="referrals"]').classList.add('active');
         }
 
         function loadProfileData() {
@@ -734,7 +744,7 @@
             document.getElementById('userDisplayCompany2').textContent = userProfile.businessName;
             document.getElementById('userDisplayCompany3').textContent = userProfile.businessName;
 
-            closeProfilePanel();
+            closeProfilePage();
             alert('Profile saved successfully!');
         }
 
@@ -824,20 +834,10 @@
             label.textContent = `${count} ${count === 1 ? 'referral' : 'referrals'}`;
         }
 
-        // Modal and Panel Click Outside Handling
+        // Modal Click Outside Handling
         document.getElementById('addReferralModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeAddReferral();
-            }
-        });
-
-        document.addEventListener('click', function(e) {
-            const profilePanel = document.getElementById('profilePanel');
-            if (profilePanel.classList.contains('active') && 
-                !profilePanel.contains(e.target) && 
-                e.target.id !== 'profilePanel' &&
-                !e.target.closest('.nav-link')) {
-                closeProfilePanel();
             }
         });
     </script>
