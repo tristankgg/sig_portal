@@ -100,7 +100,7 @@
                 <button type="submit" class="login-btn">Sign In</button>
                 <div class="login-footer">
                     <span class="login-footer-text">Developed by TGC</span>
-                    <span class="login-footer-text">v0.17</span>
+                    <span class="login-footer-text">v0.18</span>
                 </div>
             </form>
         </div>
@@ -219,26 +219,27 @@
 
         async function loadReferrals() {
             try {
-                const response = await fetch(APPS_SCRIPT_URL + '?action=getReferrals', { mode: 'no-cors' });
-                let data = [];
-                try { data = await response.json(); } catch(e) { console.log('Could not parse JSON, data may be in no-cors mode'); }
+                const response = await fetch(APPS_SCRIPT_URL + '?action=getReferrals');
+                const data = await response.json();
                 referrals = Array.isArray(data) ? data.filter(ref => ref && ref.userId === currentUser.id) : [];
                 updateTable();
                 showNotification('Referrals loaded!', 'success');
-            } catch (e) { console.error(e); showNotification('Failed to load referrals', 'error'); }
+            } catch (e) { console.error('Load error:', e); referrals = []; updateTable(); }
         }
 
         async function addReferralToSheet(ref) {
             try {
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(ref)
                 });
-                console.log('Post submitted successfully');
+                console.log('POST response status:', response.status);
+                const result = await response.json();
+                console.log('POST result:', result);
+                if (!result.success) throw new Error(result.error || 'Unknown error');
                 return true;
-            } catch (e) { console.error('Error:', e); throw e; }
+            } catch (e) { console.error('POST error:', e); throw e; }
         }
 
         function openAddReferral() { document.getElementById('addReferralModal').classList.add('active'); }
@@ -257,6 +258,7 @@
                 status: 'pending',
                 dateAdded: new Date().toLocaleDateString()
             };
+            console.log('Sending referral:', ref);
             try {
                 await addReferralToSheet(ref);
                 closeAddReferral();
