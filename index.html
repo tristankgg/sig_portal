@@ -67,7 +67,7 @@
         .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         .status-pending { background-color: rgba(240, 153, 31, 0.1); color: #f99d1c; }
         .action-btn { cursor: pointer; color: #999; font-size: 16px; border: none; background: transparent; }
-        .notification { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; z-index: 2000; animation: slideIn 0.3s; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; z-index: 2000; animation: slideIn 0.3s; min-width: 300px; }
         .notification.success { background-color: #22c55e; }
         .notification.error { background-color: #ef4444; }
         @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -246,21 +246,23 @@
                     }
                 }
                 updateTable();
-                showNotification('Referrals loaded from Google Sheets!');
+                showNotification('Referrals loaded from Google Sheets!', 'success');
             } catch (e) { console.log(e); referrals = []; updateTable(); showNotification('Failed to load referrals', 'error'); }
         }
 
         async function addReferralToSheet(ref) {
             try {
-                const values = [[ref.id, ref.userId, ref.customerName, ref.phoneNumber, ref.business, ref.email, ref.notes, ref.status, ref.dateAdded]];
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A:I/append?valueInputOption=RAW&key=${API_KEY}`;
+                const values = [[ref.id.toString(), ref.userId, ref.customerName, ref.phoneNumber, ref.business, ref.email, ref.notes, ref.status, ref.dateAdded]];
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A:I:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS&key=${API_KEY}`;
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ values: values })
                 });
-                if (!response.ok) throw new Error('Failed to add referral');
-            } catch (e) { console.error(e); showNotification('Failed to save: ' + e.message, 'error'); }
+                const responseData = await response.json();
+                if (response.status !== 200) throw new Error(responseData.error?.message || 'Failed to add referral');
+                return true;
+            } catch (e) { console.error('Error:', e); throw e; }
         }
 
         async function deleteReferralFromSheet(rowIndex) {
@@ -282,7 +284,8 @@
                         }]
                     })
                 });
-                if (!response.ok) throw new Error('Failed to delete');
+                const responseData = await response.json();
+                if (response.status !== 200) throw new Error(responseData.error?.message || 'Failed to delete');
             } catch (e) { console.error(e); showNotification('Failed to delete: ' + e.message, 'error'); }
         }
 
@@ -292,10 +295,14 @@
         async function handleAddReferral(e) {
             e.preventDefault();
             const ref = {id: Date.now(), userId: currentUser.id, customerName: document.getElementById('customerName').value, phoneNumber: document.getElementById('phoneNumber').value, business: document.getElementById('business').value, email: document.getElementById('email').value, notes: document.getElementById('notes').value, status: 'pending', dateAdded: new Date().toLocaleDateString()};
-            await addReferralToSheet(ref);
-            closeAddReferral();
-            loadReferrals();
-            showNotification('Referral added!');
+            try {
+                await addReferralToSheet(ref);
+                closeAddReferral();
+                loadReferrals();
+                showNotification('Referral added successfully!', 'success');
+            } catch (err) {
+                showNotification('Error: ' + err.message, 'error');
+            }
         }
 
         async function deleteReferral(id, rowIndex) {
@@ -358,7 +365,7 @@
             localStorage.setItem('userSession', JSON.stringify(currentUser));
             updateUserDisplay();
             closeProfilePage(new Event('click'));
-            showNotification('Profile saved!');
+            showNotification('Profile saved!', 'success');
         }
 
         function showNotification(msg, type = 'success') {
@@ -366,7 +373,7 @@
             n.className = `notification ${type}`;
             n.textContent = msg;
             document.body.appendChild(n);
-            setTimeout(() => n.remove(), 3000);
+            setTimeout(() => n.remove(), 4000);
         }
 
         document.getElementById('addReferralModal').addEventListener('click', e => { if (e.target.id === 'addReferralModal') closeAddReferral(); });
