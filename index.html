@@ -66,6 +66,7 @@
         td { padding: 16px; border-bottom: 1px solid #e5e7eb; }
         .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         .status-pending { background-color: rgba(240, 153, 31, 0.1); color: #f99d1c; }
+        .status-synced { background-color: rgba(34, 197, 94, 0.1); color: #22c55e; }
         .action-btn { cursor: pointer; color: #999; font-size: 16px; border: none; background: transparent; }
         .notification { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; z-index: 2000; animation: slideIn 0.3s; min-width: 300px; }
         .notification.success { background-color: #22c55e; }
@@ -100,7 +101,7 @@
                 <button type="submit" class="login-btn">Sign In</button>
                 <div class="login-footer">
                     <span class="login-footer-text">Developed by TGC</span>
-                    <span class="login-footer-text">v0.14</span>
+                    <span class="login-footer-text">v0.16</span>
                 </div>
             </form>
         </div>
@@ -188,10 +189,7 @@
 
     <script>
         const HARDCODED_USERS = [{"id":"1","email":"tristankgg@gmail.com","password":"password123!","profile":{"contactName":"Tristan Gallagher","contactPhone":"","businessName":"Kitchen Installation Co.","businessEmail":"","abn":"","notes":""}}];
-        const SHEET_ID = '1JxnbpBYh-Ab7m9sAaoYz0uNyDOYSWlr8NAL5JJdxnOo';
-        const API_KEY = 'AIzaSyCTqqCFkw0n3sCMuP6RM56c3mwzRp9LPyA';
-        const SHEET_NAME = 'Referrals';
-
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwm3DRKzuGdFZbqncKUwTIiFRIoX3mqMWdxu9YXK3EPznFaWWwxV5hZYI9Lyh_232nU/exec';
         let currentUser = null, referrals = [];
 
         window.addEventListener('load', () => {
@@ -222,45 +220,23 @@
 
         async function loadReferrals() {
             try {
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A:I?key=${API_KEY}`;
-                const response = await fetch(url);
+                const response = await fetch(APPS_SCRIPT_URL + '?action=getReferrals');
                 const data = await response.json();
-                referrals = [];
-                if (data.values && data.values.length > 1) {
-                    for (let i = 1; i < data.values.length; i++) {
-                        const row = data.values[i];
-                        if (row[1] === currentUser.id) {
-                            referrals.push({
-                                id: parseInt(row[0]) || i,
-                                userId: row[1],
-                                customerName: row[2] || '',
-                                phoneNumber: row[3] || '',
-                                business: row[4] || '',
-                                email: row[5] || '',
-                                notes: row[6] || '',
-                                status: row[7] || 'pending',
-                                dateAdded: row[8] || new Date().toLocaleDateString(),
-                                rowIndex: i + 1
-                            });
-                        }
-                    }
-                }
+                referrals = data.filter(ref => ref.userId === currentUser.id);
                 updateTable();
-            } catch (e) { console.log(e); referrals = []; updateTable(); }
+                showNotification('Referrals loaded!', 'success');
+            } catch (e) { console.error(e); showNotification('Failed to load referrals', 'error'); }
         }
 
         async function addReferralToSheet(ref) {
             try {
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A:I/append?valueInputOption=RAW&key=${API_KEY}`;
-                const response = await fetch(url, {
+                const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        values: [[ref.id, ref.userId, ref.customerName, ref.phoneNumber, ref.business, ref.email, ref.notes, ref.status, ref.dateAdded]]
-                    })
+                    body: JSON.stringify(ref)
                 });
                 const result = await response.json();
-                if (result.error) throw new Error(result.error.message);
+                if (!result.success) throw new Error(result.error || 'Failed to add referral');
                 return true;
             } catch (e) { console.error('Error:', e); throw e; }
         }
@@ -270,21 +246,39 @@
 
         async function handleAddReferral(e) {
             e.preventDefault();
-            const ref = {id: Date.now(), userId: currentUser.id, customerName: document.getElementById('customerName').value, phoneNumber: document.getElementById('phoneNumber').value, business: document.getElementById('business').value, email: document.getElementById('email').value, notes: document.getElementById('notes').value, status: 'pending', dateAdded: new Date().toLocaleDateString()};
+            const ref = {
+                id: Date.now(),
+                userId: currentUser.id,
+                customerName: document.getElementById('customerName').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                business: document.getElementById('business').value,
+                email: document.getElementById('email').value,
+                notes: document.getElementById('notes').value,
+                status: 'pending',
+                dateAdded: new Date().toLocaleDateString()
+            };
             try {
                 await addReferralToSheet(ref);
                 closeAddReferral();
-                setTimeout(() => loadReferrals(), 2000);
+                setTimeout(() => loadReferrals(), 1500);
                 showNotification('Referral added successfully!', 'success');
             } catch (err) {
-                showNotification('Error adding referral: ' + err.message, 'error');
+                showNotification('Error: ' + err.message, 'error');
+            }
+        }
+
+        function deleteReferral(id) {
+            if (confirm('Delete this referral?')) {
+                referrals = referrals.filter(r => r.id !== id);
+                updateTable();
+                showNotification('Referral deleted', 'success');
             }
         }
 
         function updateTable() {
             const tbody = document.getElementById('referralsTable');
             if (!referrals.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #666;">No referrals yet</td></tr>'; return; }
-            tbody.innerHTML = referrals.map(ref => `<tr><td>${ref.customerName}</td><td>${ref.phoneNumber}</td><td>${ref.business}</td><td><span class="status-badge status-${ref.status}">${ref.status}</span></td><td><button class="action-btn" onclick="return false;" style="cursor: not-allowed; opacity: 0.5;">🗑</button></td></tr>`).join('');
+            tbody.innerHTML = referrals.map(ref => `<tr><td>${ref.customerName}</td><td>${ref.phoneNumber}</td><td>${ref.business}</td><td><span class="status-badge status-${ref.status}">${ref.status}</span></td><td><button class="action-btn" onclick="deleteReferral(${ref.id})">🗑</button></td></tr>`).join('');
         }
 
         function navigateTo(page, e) {
