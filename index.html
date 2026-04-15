@@ -184,6 +184,7 @@
         const HARDCODED_USERS = [{"id":"1","email":"tristankgg@gmail.com","password":"password123!","profile":{"contactName":"Tristan Gallagher","contactPhone":"","businessName":"Kitchen Installation Co.","businessEmail":"","abn":"","notes":""}}];
         const SHEET_ID = '1JxnbpBYh-Ab7m9sAaoYz0uNyDOYSWlr8NAL5JJdxnOo';
         const API_KEY = 'AIzaSyCTqqCFkw0n3sCMuP6RM56c3mwzRp9LPyA';
+        const SHEET_NAME = 'Referrals';
 
         let currentUser = null, referrals = [];
 
@@ -215,7 +216,7 @@
 
         async function loadReferrals() {
             try {
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:I?key=${API_KEY}`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A:I?key=${API_KEY}`;
                 const response = await fetch(url);
                 const data = await response.json();
                 referrals = [];
@@ -246,7 +247,7 @@
         async function addReferralToSheet(ref) {
             try {
                 const values = [[ref.id, ref.userId, ref.customerName, ref.phoneNumber, ref.business, ref.email, ref.notes, ref.status, ref.dateAdded]];
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:I/append?valueInputOption=RAW&key=${API_KEY}`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A:I/append?valueInputOption=RAW&key=${API_KEY}`;
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
